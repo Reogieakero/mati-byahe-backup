@@ -9,7 +9,6 @@ class HistoryTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Data parsing with safety defaults
     DateTime date = DateTime.tryParse(trip['date'] ?? '') ?? DateTime.now();
     double fare = (trip['fare'] as num?)?.toDouble() ?? 0.0;
     String pickup = trip['pickup'] ?? "Unknown";
@@ -18,30 +17,28 @@ class HistoryTile extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: const BoxDecoration(
-        color: Colors.white,
+        // Removed white color and border to show the screen gradient
+        color: Colors.transparent,
         border: Border(
-          // Using softWhite for a clean, subtle divider between tiles
-          bottom: BorderSide(color: AppColors.softWhite, width: 1.5),
+          // Using a subtle navy with low opacity for the divider
+          bottom: BorderSide(color: AppColors.softWhite, width: 1),
         ),
       ),
       child: Row(
         children: [
-          // Updated to Route Icon
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppColors.primaryBlue.withOpacity(0.08),
+              color: AppColors.primaryBlue.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
             child: const Icon(
-              Icons.route_outlined, // Specific route icon from wireframe
+              Icons.route_outlined,
               color: AppColors.primaryBlue,
               size: 24,
             ),
           ),
           const SizedBox(width: 14),
-
-          // Route & Timestamp
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -60,14 +57,12 @@ class HistoryTile extends StatelessWidget {
                   DateFormat('MMM dd, yyyy • hh:mm a').format(date),
                   style: const TextStyle(
                     fontSize: 12,
-                    color: AppColors.textGrey, // Using textGrey from theme
+                    color: AppColors.textGrey,
                   ),
                 ),
               ],
             ),
           ),
-
-          // Fare Amount and Options Menu
           Row(
             children: [
               Text(
@@ -79,11 +74,7 @@ class HistoryTile extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 10),
-              const Icon(
-                Icons.more_horiz, // Three-dot menu icon from wireframe
-                color: AppColors.darkNavy,
-                size: 20,
-              ),
+              const Icon(Icons.more_horiz, color: AppColors.darkNavy, size: 20),
             ],
           ),
         ],
