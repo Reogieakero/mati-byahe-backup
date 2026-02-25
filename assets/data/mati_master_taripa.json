@@ -1,0 +1,1001 @@
+[
+  {
+    "terminal": "CITY PROPER FARE RATE MATRIX (TARIPA)",
+    "currency": "PHP",
+    "discounts": {
+      "description": "Less 20% for Senior Citizen, PWD and Students",
+      "multiplier": 0.8
+    },
+    "fare_matrix": [
+      {
+        "from": "Madang Public Market / Mati Centennial Transport Terminal Complex",
+        "to": "Bilawan 1&2, Tagawisan, Sudlon, Chan Vill, Lemente Vill, Poblacion, RRMCES/Sped, Sto. Nino, Mapantad, Lower Bliss, Lower&Upper Salazar, Magsaysay, Echavia, Daticor",
+        "rates": {
+          "40.00-49.99": 9.0,
+          "50.00-69.99": 12.0,
+          "70.00-89.99": 14.0,
+          "90.00-99.99": 15.0
+        }
+      },
+      {
+        "from": "Madang Public Market / Mati Centennial Transport Terminal Complex",
+        "to": "Brgy. Hall Sainz, Upper Bliss, Capitol Hill, Matiao School Zone, Pahamotang, Sibala Vill., Interco Drive, DOPMC",
+        "rates": {
+          "40.00-49.99": 13.0,
+          "50.00-69.99": 15.0,
+          "70.00-89.99": 17.0,
+          "90.00-99.99": 18.0
+        }
+      },
+      {
+        "from": "Madang Public Market / Mati Centennial Transport Terminal Complex",
+        "to": "Guingona, Interco Sto. Nino, Upper Capayas",
+        "rates": {
+          "40.00-49.99": 15.0,
+          "50.00-69.99": 18.0,
+          "70.00-89.99": 20.0,
+          "90.00-99.99": 21.0
+        }
+      },
+      {
+        "from": "Madang Public Market / Mati Centennial Transport Terminal Complex",
+        "to": "Martinez Subd., DorSU",
+        "rates": {
+          "40.00-49.99": 16.0,
+          "50.00-69.99": 19.0,
+          "70.00-89.99": 21.0,
+          "90.00-99.99": 22.0
+        }
+      },
+      {
+        "from": "Madang Public Market / Mati Centennial Transport Terminal Complex",
+        "to": "Magay Don Martin Marundan",
+        "rates": {
+          "40.00-49.99": 19.0,
+          "50.00-69.99": 22.0,
+          "70.00-89.99": 24.0,
+          "90.00-99.99": 25.0
+        }
+      },
+      {
+        "from": "Madang Public Market / Mati Centennial Transport Terminal Complex",
+        "to": "Upper Tagawisan, Punta Gemelina, Camansi",
+        "rates": {
+          "40.00-49.99": 12.0,
+          "50.00-69.99": 15.0,
+          "70.00-89.99": 17.0,
+          "90.00-99.99": 18.0
+        }
+      },
+      {
+        "from": "Madang Public Market / Mati Centennial Transport Terminal Complex",
+        "to": "Dahican Elem. School, Old Barangay Site",
+        "rates": {
+          "40.00-49.99": 20.0,
+          "50.00-69.99": 23.0,
+          "70.00-89.99": 25.0,
+          "90.00-99.99": 26.0
+        }
+      },
+      {
+        "from": "Madang Public Market / Mati Centennial Transport Terminal Complex",
+        "to": "Dahican Beach",
+        "rates": {
+          "40.00-49.99": 25.0,
+          "50.00-69.99": 28.0,
+          "70.00-89.99": 30.0,
+          "90.00-99.99": 31.0
+        }
+      },
+      {
+        "from": "Madang Public Market / Mati Centennial Transport Terminal Complex",
+        "to": "Maitum, Menzi, Barracks, NHA, NASA, DAR, SP, DepEd, LTO, Colegio De San Agustin",
+        "rates": {
+          "40.00-49.99": 18.0,
+          "50.00-69.99": 21.0,
+          "70.00-89.99": 23.0,
+          "90.00-99.99": 24.0
+        }
+      },
+      {
+        "from": "Madang Public Market / Mati Centennial Transport Terminal Complex",
+        "to": "Badas, Elem. School",
+        "rates": {
+          "40.00-49.99": 15.0,
+          "50.00-69.99": 18.0,
+          "70.00-89.99": 20.0,
+          "90.00-99.99": 21.0
+        }
+      },
+      {
+        "from": "Madang Public Market / Mati Centennial Transport Terminal Complex",
+        "to": "Iris Beach",
+        "rates": {
+          "40.00-49.99": 20.0,
+          "50.00-69.99": 23.0,
+          "70.00-89.99": 25.0,
+          "90.00-99.99": 26.0
+        }
+      },
+      {
+        "from": "Madang Public Market / Mati Centennial Transport Terminal Complex",
+        "to": "Basu Elem. School",
+        "rates": {
+          "40.00-49.99": 30.0,
+          "50.00-69.99": 33.0,
+          "70.00-89.99": 35.0,
+          "90.00-99.99": 36.0
+        }
+      },
+      {
+        "from": "Mati Poblacion",
+        "to": "Chan Vill., Lemente Vill., Clergy, Madang, MCTTC, Mapantad, Magsaysay, Echavia, Crossing Daticor",
+        "rates": {
+          "40.00-49.99": 9.0,
+          "50.00-69.99": 12.0,
+          "70.00-89.99": 14.0,
+          "90.00-99.99": 15.0
+        }
+      },
+      {
+        "from": "Mati Poblacion",
+        "to": "Sudlon, Brgy. Hall Sainz, Upper Bliss, Capitol Hill, Matiao School Zone, Lopez Subd., Pahamotang, Interco Drive, Sibala Vill., DOPMC",
+        "rates": {
+          "40.00-49.99": 10.0,
+          "50.00-69.99": 13.0,
+          "70.00-89.99": 15.0,
+          "90.00-99.99": 16.0
+        }
+      },
+      {
+        "from": "Mati Poblacion",
+        "to": "Bilawan 1&2, Tagawisan, Guingona, Interco Sto. Nino, Upper Capayas",
+        "rates": {
+          "40.00-49.99": 11.0,
+          "50.00-69.99": 14.0,
+          "70.00-89.99": 16.0,
+          "90.00-99.99": 17.0
+        }
+      },
+      {
+        "from": "Mati Poblacion",
+        "to": "Martinez Subd., DorSU",
+        "rates": {
+          "40.00-49.99": 12.0,
+          "50.00-69.99": 15.0,
+          "70.00-89.99": 17.0,
+          "90.00-99.99": 18.0
+        }
+      },
+      {
+        "from": "Mati Poblacion",
+        "to": "Maitum, DAR, SP, DepEd, LTO NHA, NASA, GSIS, Colegio De San Agustin",
+        "rates": {
+          "40.00-49.99": 14.0,
+          "50.00-69.99": 17.0,
+          "70.00-89.99": 19.0,
+          "90.00-99.99": 20.0
+        }
+      },
+      {
+        "from": "Mati Poblacion",
+        "to": "Dahican Elementary School",
+        "rates": {
+          "40.00-49.99": 15.0,
+          "50.00-69.99": 18.0,
+          "70.00-89.99": 20.0,
+          "90.00-99.99": 21.0
+        }
+      },
+      {
+        "from": "Mati Poblacion",
+        "to": "Magay Don Martin Marundan",
+        "rates": {
+          "40.00-49.99": 17.0,
+          "50.00-69.99": 20.0,
+          "70.00-89.99": 22.0,
+          "90.00-99.99": 23.0
+        }
+      },
+      {
+        "from": "Mati Poblacion",
+        "to": "Dahican Beach",
+        "rates": {
+          "40.00-49.99": 18.0,
+          "50.00-69.99": 21.0,
+          "70.00-89.99": 23.0,
+          "90.00-99.99": 24.0
+        }
+      },
+      {
+        "from": "Mati Poblacion",
+        "to": "Badas Elementary School",
+        "rates": {
+          "40.00-49.99": 15.0,
+          "50.00-69.99": 18.0,
+          "70.00-89.99": 20.0,
+          "90.00-99.99": 21.0
+        }
+      },
+      {
+        "from": "Mati Poblacion",
+        "to": "Upper Tagawisan, Punta Gemelina, Camansi",
+        "rates": {
+          "40.00-49.99": 13.0,
+          "50.00-69.99": 17.0,
+          "70.00-89.99": 19.0,
+          "90.00-99.99": 20.0
+        }
+      },
+      {
+        "from": "Mati Poblacion",
+        "to": "Iris Beach",
+        "rates": {
+          "40.00-49.99": 22.0,
+          "50.00-69.99": 25.0,
+          "70.00-89.99": 27.0,
+          "90.00-99.99": 28.0
+        }
+      },
+      {
+        "from": "Mati Poblacion",
+        "to": "Basu Elementary School",
+        "rates": {
+          "40.00-49.99": 27.0,
+          "50.00-69.99": 30.0,
+          "70.00-89.99": 32.0,
+          "90.00-99.99": 33.0
+        }
+      },
+      {
+        "from": "Badas",
+        "to": "Tagawisan",
+        "rates": {
+          "40.00-49.99": 9.0,
+          "50.00-69.99": 12.0,
+          "70.00-89.99": 14.0,
+          "90.00-99.99": 15.0
+        }
+      },
+      {
+        "from": "Badas",
+        "to": "Madang Public Market/Terminal",
+        "rates": {
+          "40.00-49.99": 11.0,
+          "50.00-69.99": 13.0,
+          "70.00-89.99": 15.0,
+          "90.00-99.99": 16.0
+        }
+      },
+      {
+        "from": "Badas",
+        "to": "Poblacion, Mapantad, Lower/Upper Bliss, Lower/Upper Salazar, Limatoc, Magsaysay, Echavia, Crossing Daticor",
+        "rates": {
+          "40.00-49.99": 14.0,
+          "50.00-69.99": 17.0,
+          "70.00-89.99": 19.0,
+          "90.00-99.99": 20.0
+        }
+      },
+      {
+        "from": "Badas",
+        "to": "Matiao School Zone, Lopez Subd., Pahamotang, Interco Drive, Sibala Vill, DOPMC",
+        "rates": {
+          "40.00-49.99": 17.0,
+          "50.00-69.99": 20.0,
+          "70.00-89.99": 23.0,
+          "90.00-99.99": 24.0
+        }
+      },
+      {
+        "from": "Badas",
+        "to": "Martinez Subd, DorSU",
+        "rates": {
+          "40.00-49.99": 20.0,
+          "50.00-69.99": 23.0,
+          "70.00-89.99": 25.0,
+          "90.00-99.99": 26.0
+        }
+      },
+      {
+        "from": "Badas",
+        "to": "Maitum, DAR, SP, DepEd, LTO NHA, NASA, GSIS, Colegio De San Agustin",
+        "rates": {
+          "40.00-49.99": 25.0,
+          "50.00-69.99": 28.0,
+          "70.00-89.99": 30.0,
+          "90.00-99.99": 31.0
+        }
+      },
+      {
+        "from": "Badas",
+        "to": "Magay Don Martin Marundan",
+        "rates": {
+          "40.00-49.99": 21.0,
+          "50.00-69.99": 24.0,
+          "70.00-89.99": 26.0,
+          "90.00-99.99": 27.0
+        }
+      },
+      {
+        "from": "Badas",
+        "to": "Dahican Elementary School",
+        "rates": {
+          "40.00-49.99": 35.0,
+          "50.00-69.99": 38.0,
+          "70.00-89.99": 40.0,
+          "90.00-99.99": 41.0
+        }
+      },
+      {
+        "from": "Badas",
+        "to": "Dahican Beach",
+        "rates": {
+          "40.00-49.99": 45.0,
+          "50.00-69.99": 48.0,
+          "70.00-89.99": 50.0,
+          "90.00-99.99": 51.0
+        }
+      }
+    ]
+  },
+  {
+    "terminal": "MATI NORTH BOUND TERMINAL",
+    "currency": "PHP",
+    "discounts": {
+      "description": "Less 20% for Senior Citizen, PWD and Students",
+      "multiplier": 0.8
+    },
+    "fare_matrix": [
+      {
+        "destination": "Butuasan",
+        "rates": {
+          "40.00-49.99": 29.0,
+          "50.00-69.99": 32.0,
+          "70.00-89.99": 34.0,
+          "90.00-99.99": 35.0
+        }
+      },
+      {
+        "destination": "Manguihay",
+        "rates": {
+          "40.00-49.99": 35.0,
+          "50.00-69.99": 38.0,
+          "70.00-89.99": 40.0,
+          "90.00-99.99": 41.0
+        }
+      },
+      {
+        "destination": "Blue Bless, Bangonay",
+        "rates": {
+          "40.00-49.99": 37.0,
+          "50.00-69.99": 40.0,
+          "70.00-89.99": 42.0,
+          "90.00-99.99": 43.0
+        }
+      },
+      {
+        "destination": "Masao",
+        "rates": {
+          "40.00-49.99": 41.0,
+          "50.00-69.99": 44.0,
+          "70.00-89.99": 46.0,
+          "90.00-99.99": 47.0
+        }
+      },
+      {
+        "destination": "Bobon Proper, Masao-Cogon",
+        "rates": {
+          "40.00-49.99": 43.0,
+          "50.00-69.99": 46.0,
+          "70.00-89.99": 48.0,
+          "90.00-99.99": 49.0
+        }
+      },
+      {
+        "destination": "Cogon Bobon",
+        "rates": {
+          "40.00-49.99": 46.0,
+          "50.00-69.99": 49.0,
+          "70.00-89.99": 51.0,
+          "90.00-99.99": 52.0
+        }
+      },
+      {
+        "destination": "Tamisan Proper",
+        "rates": {
+          "40.00-49.99": 49.0,
+          "50.00-69.99": 52.0,
+          "70.00-89.99": 54.0,
+          "90.00-99.99": 55.0
+        }
+      },
+      {
+        "destination": "Taganilao",
+        "rates": {
+          "40.00-49.99": 53.0,
+          "50.00-69.99": 56.0,
+          "70.00-89.99": 58.0,
+          "90.00-99.99": 59.0
+        }
+      },
+      {
+        "destination": "Binangga",
+        "rates": {
+          "40.00-49.99": 57.0,
+          "50.00-69.99": 60.0,
+          "70.00-89.99": 62.0,
+          "90.00-99.99": 63.0
+        }
+      },
+      {
+        "destination": "Batiano",
+        "rates": {
+          "40.00-49.99": 59.0,
+          "50.00-69.99": 62.0,
+          "70.00-89.99": 64.0,
+          "90.00-99.99": 65.0
+        }
+      },
+      {
+        "destination": "Magkaliwag",
+        "rates": {
+          "40.00-49.99": 63.0,
+          "50.00-69.99": 66.0,
+          "70.00-89.99": 68.0,
+          "90.00-99.99": 69.0
+        }
+      },
+      {
+        "destination": "Lawigan",
+        "rates": {
+          "40.00-49.99": 67.0,
+          "50.00-69.99": 70.0,
+          "70.00-89.99": 72.0,
+          "90.00-99.99": 73.0
+        }
+      },
+      {
+        "destination": "Lawigan Proper",
+        "rates": {
+          "40.00-49.99": 69.0,
+          "50.00-69.99": 72.0,
+          "70.00-89.99": 74.0,
+          "90.00-99.99": 75.0
+        }
+      },
+      {
+        "destination": "Coprasan, DMM",
+        "rates": {
+          "40.00-49.99": 23.0,
+          "50.00-69.99": 26.0,
+          "70.00-89.99": 28.0,
+          "90.00-99.99": 29.0
+        }
+      },
+      {
+        "destination": "DMM Centro. Caguisocan, Tamia",
+        "rates": {
+          "40.00-49.99": 25.0,
+          "50.00-69.99": 28.0,
+          "70.00-89.99": 30.0,
+          "90.00-99.99": 31.0
+        }
+      },
+      {
+        "destination": "Buso Proper",
+        "rates": {
+          "40.00-49.99": 31.0,
+          "50.00-69.99": 34.0,
+          "70.00-89.99": 36.0,
+          "90.00-99.99": 37.0
+        }
+      },
+      {
+        "destination": "Bangkal",
+        "rates": {
+          "40.00-49.99": 35.0,
+          "50.00-69.99": 38.0,
+          "70.00-89.99": 40.0,
+          "90.00-99.99": 41.0
+        }
+      },
+      {
+        "destination": "Pising",
+        "rates": {
+          "40.00-49.99": 39.0,
+          "50.00-69.99": 42.0,
+          "70.00-89.99": 44.0,
+          "90.00-99.99": 45.0
+        }
+      },
+      {
+        "destination": "Tagbinonga Proper",
+        "rates": {
+          "40.00-49.99": 41.0,
+          "50.00-69.99": 44.0,
+          "70.00-89.99": 46.0,
+          "90.00-99.99": 47.0
+        }
+      },
+      {
+        "destination": "Marfori",
+        "rates": {
+          "40.00-49.99": 26.0,
+          "50.00-69.99": 29.0,
+          "70.00-89.99": 31.0,
+          "90.00-99.99": 32.0
+        }
+      },
+      {
+        "destination": "Calaparan",
+        "rates": {
+          "40.00-49.99": 32.0,
+          "50.00-69.99": 35.0,
+          "70.00-89.99": 37.0,
+          "90.00-99.99": 38.0
+        }
+      },
+      {
+        "destination": "Ligadan, Panombon",
+        "rates": {
+          "40.00-49.99": 27.0,
+          "50.00-69.99": 29.0,
+          "70.00-89.99": 32.0,
+          "90.00-99.99": 33.0
+        }
+      },
+      {
+        "destination": "Don Enrique Lopez Brgy. Site",
+        "rates": {
+          "40.00-49.99": 30.0,
+          "50.00-69.99": 33.0,
+          "70.00-89.99": 35.0,
+          "90.00-99.99": 36.0
+        }
+      },
+      {
+        "destination": "Canipa",
+        "rates": {
+          "40.00-49.99": 32.0,
+          "50.00-69.99": 35.0,
+          "70.00-89.99": 37.0,
+          "90.00-99.99": 38.0
+        }
+      },
+      {
+        "destination": "Tambon",
+        "rates": {
+          "40.00-49.99": 41.0,
+          "50.00-69.99": 42.0,
+          "70.00-89.99": 46.0,
+          "90.00-99.99": 47.0
+        }
+      },
+      {
+        "destination": "Don Salvador Lopez Proper",
+        "rates": {
+          "40.00-49.99": 42.0,
+          "50.00-69.99": 45.0,
+          "70.00-89.99": 47.0,
+          "90.00-99.99": 48.0
+        }
+      },
+      {
+        "destination": "Bunaan",
+        "rates": {
+          "40.00-49.99": 30.0,
+          "50.00-69.99": 33.0,
+          "70.00-89.99": 35.0,
+          "90.00-99.99": 36.0
+        }
+      },
+      {
+        "destination": "Ligaran",
+        "rates": {
+          "40.00-49.99": 31.0,
+          "50.00-69.99": 34.0,
+          "70.00-89.99": 36.0,
+          "90.00-99.99": 37.0
+        }
+      },
+      {
+        "destination": "Sta. Cruz",
+        "rates": {
+          "40.00-49.99": 47.0,
+          "50.00-69.99": 50.0,
+          "70.00-89.99": 52.0,
+          "90.00-99.99": 53.0
+        }
+      },
+      {
+        "destination": "Brgy. Site Mayo",
+        "rates": {
+          "40.00-49.99": 35.0,
+          "50.00-69.99": 38.0,
+          "70.00-89.99": 40.0,
+          "90.00-99.99": 41.0
+        }
+      },
+      {
+        "destination": "Slide",
+        "rates": {
+          "40.00-49.99": 40.0,
+          "50.00-69.99": 43.0,
+          "70.00-89.99": 45.0,
+          "90.00-99.99": 46.0
+        }
+      },
+      {
+        "destination": "Tagabakid Proper",
+        "rates": {
+          "40.00-49.99": 38.0,
+          "50.00-69.99": 41.0,
+          "70.00-89.99": 42.0,
+          "90.00-99.99": 43.0
+        }
+      },
+      {
+        "destination": "Bugakan",
+        "rates": {
+          "40.00-49.99": 45.0,
+          "50.00-69.99": 48.0,
+          "70.00-89.99": 50.0,
+          "90.00-99.99": 51.0
+        }
+      },
+      {
+        "destination": "Crossing Ompao",
+        "rates": {
+          "40.00-49.99": 55.0,
+          "50.00-69.99": 58.0,
+          "70.00-89.99": 60.0,
+          "90.00-99.99": 61.0
+        }
+      }
+    ]
+  },
+  {
+    "terminal": "MATI SOUTH BOUND TERMINAL",
+    "currency": "PHP",
+    "discounts": {
+      "description": "Less 20% for Senior Citizen, PWD and Student",
+      "multiplier": 0.8
+    },
+    "fare_matrix": [
+      {
+        "destination": "Provincial Jail, Tagbobolo",
+        "rates": {
+          "40.00-49.99": 22.0,
+          "50.00-69.99": 25.0,
+          "70.00-89.99": 27.0,
+          "90.00-99.99": 28.0
+        }
+      },
+      {
+        "destination": "Kawayan",
+        "rates": {
+          "40.00-49.99": 27.0,
+          "50.00-69.99": 29.0,
+          "70.00-89.99": 32.0,
+          "90.00-99.99": 33.0
+        }
+      },
+      {
+        "destination": "Campo 1",
+        "rates": {
+          "40.00-49.99": 32.0,
+          "50.00-69.99": 35.0,
+          "70.00-89.99": 37.0,
+          "90.00-99.99": 38.0
+        }
+      },
+      {
+        "destination": "Anislag",
+        "rates": {
+          "40.00-49.99": 37.0,
+          "50.00-69.99": 40.0,
+          "70.00-89.99": 42.0,
+          "90.00-99.99": 43.0
+        }
+      },
+      {
+        "destination": "Binaguiohan",
+        "rates": {
+          "40.00-49.99": 42.0,
+          "50.00-69.99": 45.0,
+          "70.00-89.99": 47.0,
+          "90.00-99.99": 48.0
+        }
+      },
+      {
+        "destination": "Licop Sainz",
+        "rates": {
+          "40.00-49.99": 47.0,
+          "50.00-69.99": 50.0,
+          "70.00-89.99": 52.0,
+          "90.00-99.99": 53.0
+        }
+      },
+      {
+        "destination": "Tawas",
+        "rates": {
+          "40.00-49.99": 41.0,
+          "50.00-69.99": 44.0,
+          "70.00-89.99": 46.0,
+          "90.00-99.99": 47.0
+        }
+      },
+      {
+        "destination": "Taguibo Proper",
+        "rates": {
+          "40.00-49.99": 45.0,
+          "50.00-69.99": 48.0,
+          "70.00-89.99": 50.0,
+          "90.00-99.99": 51.0
+        }
+      },
+      {
+        "destination": "Pulang Lupa",
+        "rates": {
+          "40.00-49.99": 47.0,
+          "50.00-69.99": 50.0,
+          "70.00-89.99": 52.0,
+          "90.00-99.99": 53.0
+        }
+      },
+      {
+        "destination": "Hagdan",
+        "rates": {
+          "40.00-49.99": 49.0,
+          "50.00-69.99": 52.0,
+          "70.00-89.99": 54.0,
+          "90.00-99.99": 55.0
+        }
+      },
+      {
+        "destination": "Waywayan",
+        "rates": {
+          "40.00-49.99": 55.0,
+          "50.00-69.99": 58.0,
+          "70.00-89.99": 60.0,
+          "90.00-99.99": 61.0
+        }
+      },
+      {
+        "destination": "Taguikan",
+        "rates": {
+          "40.00-49.99": 29.0,
+          "50.00-69.99": 32.0,
+          "70.00-89.99": 34.0,
+          "90.00-99.99": 35.0
+        }
+      },
+      {
+        "destination": "Mainas Culian Proper",
+        "rates": {
+          "40.00-49.99": 33.0,
+          "50.00-69.99": 36.0,
+          "70.00-89.99": 38.0,
+          "90.00-99.99": 39.0
+        }
+      },
+      {
+        "destination": "Crossing Libudon",
+        "rates": {
+          "40.00-49.99": 41.0,
+          "50.00-69.99": 44.0,
+          "70.00-89.99": 46.0,
+          "90.00-99.99": 47.0
+        }
+      },
+      {
+        "destination": "Bigue 1",
+        "rates": {
+          "40.00-49.99": 47.0,
+          "50.00-69.99": 50.0,
+          "70.00-89.99": 52.0,
+          "90.00-99.99": 53.0
+        }
+      },
+      {
+        "destination": "Bigue 2",
+        "rates": {
+          "40.00-49.99": 49.0,
+          "50.00-69.99": 52.0,
+          "70.00-89.99": 54.0,
+          "90.00-99.99": 55.0
+        }
+      },
+      {
+        "destination": "Mamacao",
+        "rates": {
+          "40.00-49.99": 51.0,
+          "50.00-69.99": 54.0,
+          "70.00-89.99": 56.0,
+          "90.00-99.99": 57.0
+        }
+      },
+      {
+        "destination": "Libudon Proper",
+        "rates": {
+          "40.00-49.99": 57.0,
+          "50.00-69.99": 60.0,
+          "70.00-89.99": 62.0,
+          "90.00-99.99": 63.0
+        }
+      },
+      {
+        "destination": "Danao Proper",
+        "rates": {
+          "40.00-49.99": 65.0,
+          "50.00-69.99": 68.0,
+          "70.00-89.99": 70.0,
+          "90.00-99.99": 71.0
+        }
+      },
+      {
+        "destination": "Sanghay Proper",
+        "rates": {
+          "40.00-49.99": 85.0,
+          "50.00-69.99": 88.0,
+          "70.00-89.99": 90.0,
+          "90.00-99.99": 91.0
+        }
+      },
+      {
+        "destination": "Dawan Proper",
+        "rates": {
+          "40.00-49.99": 47.0,
+          "50.00-69.99": 50.0,
+          "70.00-89.99": 52.0,
+          "90.00-99.99": 53.0
+        }
+      },
+      {
+        "destination": "San Pedro",
+        "rates": {
+          "40.00-49.99": 45.0,
+          "50.00-69.99": 48.0,
+          "70.00-89.99": 50.0,
+          "90.00-99.99": 51.0
+        }
+      },
+      {
+        "destination": "Tagamot",
+        "rates": {
+          "40.00-49.99": 59.0,
+          "50.00-69.99": 62.0,
+          "70.00-89.99": 64.0,
+          "90.00-99.99": 65.0
+        }
+      },
+      {
+        "destination": "Lapasan",
+        "rates": {
+          "40.00-49.99": 77.0,
+          "50.00-69.99": 80.0,
+          "70.00-89.99": 82.0,
+          "90.00-99.99": 83.0
+        }
+      },
+      {
+        "destination": "Subay 1",
+        "rates": {
+          "40.00-49.99": 51.0,
+          "50.00-69.99": 54.0,
+          "70.00-89.99": 56.0,
+          "90.00-99.99": 57.0
+        }
+      },
+      {
+        "destination": "Subay 2",
+        "rates": {
+          "40.00-49.99": 53.0,
+          "50.00-69.99": 57.0,
+          "70.00-89.99": 59.0,
+          "90.00-99.99": 60.0
+        }
+      },
+      {
+        "destination": "Mamali Proper",
+        "rates": {
+          "40.00-49.99": 57.0,
+          "50.00-69.99": 60.0,
+          "70.00-89.99": 62.0,
+          "90.00-99.99": 63.0
+        }
+      },
+      {
+        "destination": "Tagdodo",
+        "rates": {
+          "40.00-49.99": 61.0,
+          "50.00-69.99": 64.0,
+          "70.00-89.99": 66.0,
+          "90.00-99.99": 67.0
+        }
+      },
+      {
+        "destination": "Silad",
+        "rates": {
+          "40.00-49.99": 67.0,
+          "50.00-69.99": 70.0,
+          "70.00-89.99": 72.0,
+          "90.00-99.99": 73.0
+        }
+      },
+      {
+        "destination": "Banluton",
+        "rates": {
+          "40.00-49.99": 75.0,
+          "50.00-69.99": 78.0,
+          "70.00-89.99": 80.0,
+          "90.00-99.99": 81.0
+        }
+      },
+      {
+        "destination": "Macambol Proper",
+        "rates": {
+          "40.00-49.99": 85.0,
+          "50.00-69.99": 88.0,
+          "70.00-89.99": 90.0,
+          "90.00-99.99": 91.0
+        }
+      },
+      {
+        "destination": "Casinihan",
+        "rates": {
+          "40.00-49.99": 99.0,
+          "50.00-69.99": 102.0,
+          "70.00-89.99": 104.0,
+          "90.00-99.99": 105.0
+        }
+      },
+      {
+        "destination": "Wagon",
+        "rates": {
+          "40.00-49.99": 115.0,
+          "50.00-69.99": 118.0,
+          "70.00-89.99": 120.0,
+          "90.00-99.99": 121.0
+        }
+      },
+      {
+        "destination": "Magum",
+        "rates": {
+          "40.00-49.99": 135.0,
+          "50.00-69.99": 138.0,
+          "70.00-89.99": 140.0,
+          "90.00-99.99": 141.0
+        }
+      },
+      {
+        "destination": "Lanca",
+        "rates": {
+          "40.00-49.99": 174.0,
+          "50.00-69.99": 177.0,
+          "70.00-89.99": 179.0,
+          "90.00-99.99": 180.0
+        }
+      },
+      {
+        "destination": "Luban",
+        "rates": {
+          "40.00-49.99": 188.0,
+          "50.00-69.99": 191.0,
+          "70.00-89.99": 193.0,
+          "90.00-99.99": 194.0
+        }
+      },
+      {
+        "destination": "Cabuaya",
+        "rates": {
+          "40.00-49.99": 204.0,
+          "50.00-69.99": 207.0,
+          "70.00-89.99": 209.0,
+          "90.00-99.99": 210.0
+        }
+      }
+    ]
+  }
+]

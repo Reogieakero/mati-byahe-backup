@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.0/lucide.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      /* Custom curve for the notched FAB effect */
+      .nav-clip {
+        background: white;
+        filter: drop-shadow(0 -4px 6px -1px rgb(0 0 0 / 0.1));
+        clip-path: polygon(
+          0% 0%,
+          35% 0%,
+          40% 15%,
+          50% 25%,
+          60% 15%,
+          65% 0%,
+          100% 0%,
+          100% 100%,
+          0% 100%
+        );
+      }
+
+      /* Smooth transitions for active states */
+      .nav-item {
+        transition: all 0.2s ease-in-out;
+      }
+
+      .active-tab {
+        color: #0d9488; /* Teal-600 */
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100 flex items-end justify-center min-h-screen pb-10">
+    <!-- Mobile Container (Simulating Phone Viewport) -->
+    <div class="relative w-full max-w-md h-[120px] flex flex-col justify-end">
+      <!-- FAB Button -->
+      <div class="absolute top-0 left-1/2 -translate-x-1/2 z-20">
+        <button
+          class="bg-teal-600 hover:bg-teal-700 text-white p-4 rounded-full shadow-lg border-4 border-gray-100 flex items-center justify-center transition-transform active:scale-90"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="28"
+            height="28"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="lucide lucide-qr-code"
+          >
+            <rect width="5" height="5" x="3" y="3" rx="1" />
+            <rect width="5" height="5" x="16" y="3" rx="1" />
+            <rect width="5" height="5" x="3" y="16" rx="1" />
+            <path d="M21 16h-3a2 2 0 0 0-2 2v3" />
+            <path d="M21 21v.01" />
+            <path d="M12 7v3" />
+            <path d="M7 12h3" />
+            <path d="M12 20v.01" />
+            <path d="M17 12h.01" />
+            <path d="M12 12h.01" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Navigation Bar -->
+      <nav
+        class="nav-clip w-full h-[75px] bg-white flex items-center justify-between px-4 pb-2"
+      >
+        <!-- Home Tab -->
+        <button
+          class="nav-item active-tab flex flex-col items-center justify-center w-16 gap-1 group"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="group-hover:scale-110 transition-transform"
+          >
+            <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+            <polyline points="9 22 9 12 15 12 15 22" />
+          </svg>
+          <span class="text-[10px] font-bold uppercase tracking-wider"
+            >Home</span
+          >
+        </button>
+
+        <!-- History Tab -->
+        <button
+          class="nav-item text-gray-400 hover:text-teal-600 flex flex-col items-center justify-center w-16 gap-1 group"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="group-hover:scale-110 transition-transform"
+          >
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+            <path d="M3 3v5h5" />
+            <path d="M12 7v5l4 2" />
+          </svg>
+          <span class="text-[10px] font-medium uppercase tracking-wider"
+            >History</span
+          >
+        </button>
+
+        <!-- Spacer for FAB -->
+        <div class="w-16"></div>
+
+        <!-- Report Tab -->
+        <button
+          class="nav-item text-gray-400 hover:text-teal-600 flex flex-col items-center justify-center w-16 gap-1 group"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="group-hover:scale-110 transition-transform"
+          >
+            <path
+              d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"
+            />
+            <line x1="4" x2="4" y1="22" y2="15" />
+          </svg>
+          <span class="text-[10px] font-medium uppercase tracking-wider"
+            >Report</span
+          >
+        </button>
+
+        <!-- Profile Tab -->
+        <button
+          class="nav-item text-gray-400 hover:text-teal-600 flex flex-col items-center justify-center w-16 gap-1 group"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="group-hover:scale-110 transition-transform"
+          >
+            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+          </svg>
+          <span class="text-[10px] font-medium uppercase tracking-wider"
+            >Profile</span
+          >
+        </button>
+      </nav>
+    </div>
+  </body>
+</html>
