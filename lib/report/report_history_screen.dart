@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:intl/intl.dart';
 import '../core/constant/app_colors.dart';
 import '../core/database/local_database.dart';
 
@@ -20,10 +21,19 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
     return await _localDb.getReportHistory(user.id);
   }
 
+  String _formatDate(String? dateStr) {
+    if (dateStr == null) return "";
+    try {
+      final DateTime date = DateTime.parse(dateStr).toLocal();
+      return DateFormat('MMM dd, yyyy').format(date);
+    } catch (e) {
+      return "";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBody: true,
       backgroundColor: Colors.white,
       body: Container(
         width: double.infinity,
@@ -58,14 +68,11 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
                   }
 
                   return ListView.builder(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 8,
-                    ),
+                    padding: EdgeInsets.zero,
                     itemCount: snapshot.data!.length,
                     itemBuilder: (context, index) {
                       final report = snapshot.data![index];
-                      return _buildReportCard(report);
+                      return _buildReportTile(report);
                     },
                   );
                 },
@@ -101,61 +108,89 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
     );
   }
 
-  Widget _buildReportCard(Map<String, dynamic> report) {
+  Widget _buildReportTile(Map<String, dynamic> report) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.8),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.redAccent.withOpacity(0.1)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      decoration: const BoxDecoration(
+        border: Border(
+          bottom: BorderSide(color: AppColors.softWhite, width: 0.8),
+        ),
       ),
-      child: Column(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                report['issue_type'].toString().toUpperCase(),
-                style: const TextStyle(
-                  color: Colors.redAccent,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
-              Icon(
-                report['evidence_path'] != null
-                    ? Icons.attach_file
-                    : Icons.notes,
-                size: 14,
-                color: Colors.grey,
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            report['description'] ?? "No additional details provided.",
-            style: TextStyle(
-              fontSize: 13,
-              color: AppColors.darkNavy.withOpacity(0.8),
-              height: 1.4,
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.redAccent.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(
+              Icons.report_problem_rounded,
+              color: Colors.redAccent,
+              size: 20,
             ),
           ),
-          const SizedBox(height: 12),
-          Text(
-            "TRIP ID: ${report['trip_uuid'].toString().toUpperCase().substring(0, 8)}",
-            style: const TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey,
+          const SizedBox(width: 15),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      report['issue_type'].toString().toUpperCase(),
+                      style: const TextStyle(
+                        color: AppColors.darkNavy,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    Text(
+                      _formatDate(report['reported_at']),
+                      style: const TextStyle(
+                        color: AppColors.textGrey,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  report['description'] ?? "No details provided.",
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppColors.darkNavy.withOpacity(0.6),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    Text(
+                      "TRIP ID: ${report['trip_uuid'].toString().toUpperCase().substring(0, 8)}",
+                      style: const TextStyle(
+                        fontSize: 9,
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.textGrey,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    if (report['evidence_path'] != null)
+                      const Icon(
+                        Icons.attach_file,
+                        size: 12,
+                        color: AppColors.textGrey,
+                      ),
+                  ],
+                ),
+              ],
             ),
           ),
         ],
@@ -168,15 +203,17 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.history, size: 48, color: Colors.grey.shade300),
-          const SizedBox(height: 16),
-          Text(
-            "NO REPORTS YET",
+          Icon(
+            Icons.history_rounded,
+            size: 60,
+            color: AppColors.darkNavy.withOpacity(0.2),
+          ),
+          const SizedBox(height: 10),
+          const Text(
+            "No report history found",
             style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w900,
-              color: Colors.grey.shade400,
-              letterSpacing: 1.1,
+              color: AppColors.textGrey,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ],
