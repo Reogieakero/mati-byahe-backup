@@ -1,8 +1,12 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../core/constant/app_colors.dart';
-import 'widgets/reason_dropdown.dart';
+import 'widgets/reason_selector.dart';
 import 'widgets/details_input.dart';
+import 'widgets/other_reason_input.dart';
 import 'widgets/submit_button.dart';
+import 'widgets/image_proof.dart';
 
 class ReportScreen extends StatefulWidget {
   final Map<String, dynamic> trip;
@@ -15,31 +19,32 @@ class ReportScreen extends StatefulWidget {
 
 class _ReportScreenState extends State<ReportScreen> {
   final TextEditingController _detailsController = TextEditingController();
+  final TextEditingController _otherReasonController = TextEditingController();
   String? _selectedReason;
+  File? _proofImage;
 
   final List<String> _reasons = [
     "Incorrect Fare",
     "Driver Behavior",
     "Vehicle Issue",
     "Route Issue",
+    "Smoking",
+    "Uncomfortable Ride",
     "Other",
   ];
 
-  void _handleSubmit() {
-    if (_selectedReason == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Please select a reason")));
-      return;
-    }
-
-    Navigator.pop(context);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Report submitted successfully."),
-        backgroundColor: Colors.redAccent,
-      ),
+  Future<void> _handleImagePick() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? pickedFile = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 70,
     );
+
+    if (pickedFile != null) {
+      setState(() {
+        _proofImage = File(pickedFile.path);
+      });
+    }
   }
 
   @override
@@ -72,11 +77,20 @@ class _ReportScreenState extends State<ReportScreen> {
                   vertical: 16,
                 ),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    ReasonDropdown(
-                      value: _selectedReason,
+                    ReasonSelector(
+                      selectedReason: _selectedReason,
                       reasons: _reasons,
-                      onChanged: (val) => setState(() => _selectedReason = val),
+                      onSelected: (val) =>
+                          setState(() => _selectedReason = val),
+                    ),
+                    if (_selectedReason == "Other")
+                      OtherReasonInput(controller: _otherReasonController),
+                    ImageProof(
+                      image: _proofImage,
+                      onPickImage: _handleImagePick,
+                      onRemoveImage: () => setState(() => _proofImage = null),
                     ),
                     const SizedBox(height: 24),
                     DetailsInput(controller: _detailsController),
@@ -87,7 +101,18 @@ class _ReportScreenState extends State<ReportScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: SubmitButton(onPressed: _handleSubmit),
+      bottomNavigationBar: SubmitButton(
+        onPressed: () {
+          if (_selectedReason == null) return;
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Report submitted successfully."),
+              backgroundColor: Colors.redAccent,
+            ),
+          );
+        },
+      ),
     );
   }
 
