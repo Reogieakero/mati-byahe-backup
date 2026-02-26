@@ -10,6 +10,8 @@ class ReportButton extends StatelessWidget {
   void _navigateToReport(BuildContext context) {
     Navigator.of(context).push(
       PageRouteBuilder(
+        transitionDuration: const Duration(milliseconds: 500),
+        reverseTransitionDuration: const Duration(milliseconds: 500),
         pageBuilder: (context, animation, secondaryAnimation) =>
             ReportScreen(trip: trip),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {

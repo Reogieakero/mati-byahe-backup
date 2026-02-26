@@ -11,7 +11,7 @@ class ReportScreen extends StatefulWidget {
 }
 
 class _ReportScreenState extends State<ReportScreen> {
-  final TextEditingController _controller = TextEditingController();
+  final TextEditingController _detailsController = TextEditingController();
   String? _selectedReason;
 
   final List<String> _reasons = [
@@ -79,7 +79,7 @@ class _ReportScreenState extends State<ReportScreen> {
             ),
             const SizedBox(height: 24),
             const Text(
-              "DETAILS",
+              "ADDITIONAL DETAILS",
               style: TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.w900,
@@ -88,10 +88,10 @@ class _ReportScreenState extends State<ReportScreen> {
             ),
             const SizedBox(height: 12),
             TextField(
-              controller: _controller,
+              controller: _detailsController,
               maxLines: 5,
               decoration: InputDecoration(
-                hintText: "Describe what happened...",
+                hintText: "Describe the issue...",
                 filled: true,
                 fillColor: Colors.grey[100],
                 border: OutlineInputBorder(
@@ -110,7 +110,7 @@ class _ReportScreenState extends State<ReportScreen> {
             Navigator.pop(context);
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text("Report submitted."),
+                content: Text("Report submitted successfully."),
                 backgroundColor: Colors.redAccent,
               ),
             );
