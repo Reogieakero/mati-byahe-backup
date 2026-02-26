@@ -207,4 +207,9 @@ class LocalDatabase {
       orderBy: 'id DESC', // Show newest reports first
     );
   }
+
+  Future<int> deleteReport(int id) async {
+    final db = await database;
+    return await db.delete('reports', where: 'id = ?', whereArgs: [id]);
+  }
 }
