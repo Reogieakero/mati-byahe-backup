@@ -129,9 +129,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 password,
                                 _userRole,
                               );
-
                               if (!mounted) return;
-
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
@@ -143,22 +141,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               if (!mounted) return;
                               setState(() => _isLoading = false);
 
-                              String msg = e.toString().replaceAll(
-                                "Exception: ",
-                                "",
-                              );
-                              bool isOfflineSuccess = msg.contains("Offline");
+                              String err = e.toString().toLowerCase();
+                              String friendlyMsg =
+                                  "Something went wrong. Please try again.";
 
-                              _showNotification(
-                                msg,
-                                isError: !isOfflineSuccess,
-                              );
-
-                              if (isOfflineSuccess) {
-                                Future.delayed(const Duration(seconds: 2), () {
-                                  if (mounted) Navigator.pop(context);
-                                });
+                              if (err.contains("network") ||
+                                  err.contains("socket")) {
+                                friendlyMsg =
+                                    "Connection lost. Please check your internet.";
+                              } else if (err.contains("unexpected_failure") ||
+                                  err.contains("database")) {
+                                friendlyMsg =
+                                    "Server error. Your account might already be created, try logging in.";
+                              } else if (err.contains("already registered")) {
+                                friendlyMsg = "This email is already in use.";
                               }
+
+                              _showNotification(friendlyMsg, isError: true);
                             }
                           },
                         ),

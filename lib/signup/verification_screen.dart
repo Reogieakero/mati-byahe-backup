@@ -7,7 +7,7 @@ import '../core/database/local_database.dart';
 import 'data/signup_repository.dart';
 import 'widgets/signup_background.dart';
 import '../login/widgets/login_widgets.dart';
-import '../home/home_screen.dart';
+import '../navigation/main_navigation.dart';
 
 class VerificationScreen extends StatefulWidget {
   final String email;
@@ -42,70 +42,6 @@ class _VerificationScreenState extends State<VerificationScreen> {
     );
   }
 
-  Future<bool> _ensureSynced() async {
-    try {
-      final db = await _localDb.database;
-      final List<Map<String, dynamic>> users = await db.query(
-        'users',
-        where: 'email = ?',
-        whereArgs: [widget.email],
-      );
-
-      if (users.isEmpty) return false;
-      final user = users.first;
-
-      if (user['is_synced'] == 0) {
-        final internetResult = await InternetAddress.lookup('google.com');
-        if (internetResult.isNotEmpty &&
-            internetResult[0].rawAddress.isNotEmpty) {
-          final AuthResponse res = await Supabase.instance.client.auth.signUp(
-            email: user['email'],
-            password: user['password'],
-            data: {'role': user['role']},
-          );
-
-          if (res.user != null) {
-            await db.update(
-              'users',
-              {'is_synced': 1, 'id': res.user!.id},
-              where: 'email = ?',
-              whereArgs: [widget.email],
-            );
-          }
-        }
-      }
-      return true;
-    } catch (e) {
-      if (e.toString().contains("already registered")) {
-        final db = await _localDb.database;
-        await db.update(
-          'users',
-          {'is_synced': 1},
-          where: 'email = ?',
-          whereArgs: [widget.email],
-        );
-        return true;
-      }
-      return false;
-    }
-  }
-
-  Future<void> _resendToken() async {
-    setState(() => _isLoading = true);
-    try {
-      await _ensureSynced();
-      await Supabase.instance.client.auth.resend(
-        type: OtpType.signup,
-        email: widget.email,
-      );
-      _showNotification("A new 8-digit token has been sent.", isError: false);
-    } catch (e) {
-      _showNotification("Failed to resend. Please try again later.");
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
-  }
-
   Future<void> _verifyOTP() async {
     if (_codeController.text.length < 8) {
       _showNotification("Please enter the complete 8-digit code.");
@@ -114,7 +50,6 @@ class _VerificationScreenState extends State<VerificationScreen> {
 
     setState(() => _isLoading = true);
     try {
-      await _ensureSynced();
       await Supabase.instance.client.auth.verifyOTP(
         token: _codeController.text.trim(),
         type: OtpType.signup,
@@ -122,11 +57,16 @@ class _VerificationScreenState extends State<VerificationScreen> {
       );
 
       await _repository.markAsVerified(widget.email);
-      if (mounted) _showSuccessDialog();
+
+      if (mounted) {
+        setState(() => _isLoading = false);
+        _showSuccessDialog();
+      }
     } catch (e) {
-      _showNotification("Invalid or expired code. Please try again.");
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+        _showNotification("Invalid or expired code. Please try again.");
+      }
     }
   }
 
@@ -170,12 +110,12 @@ class _VerificationScreenState extends State<VerificationScreen> {
                     ? user.first['role']
                     : "Passenger";
 
-                if (mounted) {
+                if (context.mounted) {
                   Navigator.pushAndRemoveUntil(
                     context,
                     MaterialPageRoute(
                       builder: (context) =>
-                          HomeScreen(email: widget.email, role: role),
+                          MainNavigation(email: widget.email, role: role),
                     ),
                     (route) => false,
                   );
@@ -226,7 +166,6 @@ class _VerificationScreenState extends State<VerificationScreen> {
                   ),
                   const SizedBox(height: 40),
                   PinCodeTextField(
-                    key: UniqueKey(),
                     appContext: context,
                     length: 8,
                     controller: _codeController,
@@ -271,7 +210,27 @@ class _VerificationScreenState extends State<VerificationScreen> {
           style: TextStyle(color: AppColors.textGrey, fontSize: 13),
         ),
         TextButton(
-          onPressed: _isLoading ? null : _resendToken,
+          onPressed: _isLoading
+              ? null
+              : () async {
+                  setState(() => _isLoading = true);
+                  try {
+                    await Supabase.instance.client.auth.resend(
+                      type: OtpType.signup,
+                      email: widget.email,
+                    );
+                    _showNotification(
+                      "A new token has been sent.",
+                      isError: false,
+                    );
+                  } catch (e) {
+                    _showNotification(
+                      "Failed to resend. Please try again later.",
+                    );
+                  } finally {
+                    if (mounted) setState(() => _isLoading = false);
+                  }
+                },
           child: const Text(
             "Resend Secure Code",
             style: TextStyle(
