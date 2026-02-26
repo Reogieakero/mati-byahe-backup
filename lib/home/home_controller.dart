@@ -140,8 +140,8 @@ class HomeController {
     final overlayEntry = OverlayEntry(
       builder: (context) => Positioned(
         top: MediaQuery.of(context).padding.top + 10,
-        left: 20,
-        right: 20,
+        left: 15,
+        right: 15,
         child: Material(
           color: Colors.transparent,
           child: TweenAnimationBuilder(
@@ -211,6 +211,7 @@ class HomeController {
         ),
       ),
     );
+
     overlay.insert(overlayEntry);
     Future.delayed(const Duration(seconds: 3), () => overlayEntry.remove());
   }
