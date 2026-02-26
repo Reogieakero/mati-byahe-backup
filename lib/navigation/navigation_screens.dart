@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../home/home_screen.dart';
 import '../history/history_screen.dart';
 import '../profile/profile_screen.dart';
+import '../report/report_history_screen.dart'; //
 import '../core/constant/app_texts.dart';
 
 class NavigationScreens {
@@ -19,9 +20,9 @@ class NavigationScreens {
 
     return [
       HomeScreen(email: email, role: role),
-      HistoryScreen(email: email), // Removed const and passed email
+      HistoryScreen(email: email),
       _placeholder("Scanner"),
-      _placeholder(AppTexts.navReport),
+      const ReportHistoryScreen(), // Replaced placeholder with actual screen
       ProfileScreen(email: email, role: role),
     ];
   }

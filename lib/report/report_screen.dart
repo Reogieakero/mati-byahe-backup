@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../core/constant/app_colors.dart';
+import '../components/confirmation_dialog.dart';
 import 'widgets/reason_selector.dart';
 import 'widgets/details_input.dart';
 import 'widgets/other_reason_input.dart';
@@ -38,6 +39,87 @@ class _ReportScreenState extends State<ReportScreen> {
     "Other",
   ];
 
+  void _showSuccessNotification(BuildContext context) {
+    final overlay = Overlay.of(context);
+    final overlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        top: MediaQuery.of(context).padding.top + 10,
+        left: 15,
+        right: 15,
+        child: Material(
+          color: Colors.transparent,
+          child: TweenAnimationBuilder(
+            duration: const Duration(milliseconds: 500),
+            tween: Tween<double>(begin: -100, end: 0),
+            curve: Curves.easeOutBack,
+            builder: (context, double value, child) {
+              return Transform.translate(
+                offset: Offset(0, value),
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppColors.darkNavy,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.3),
+                        blurRadius: 10,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: const BoxDecoration(
+                          color: Colors.redAccent,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.check_circle,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                      ),
+                      const SizedBox(width: 15),
+                      const Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              "Report Submitted",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            ),
+                            Text(
+                              "Thank you for your feedback.",
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+
+    overlay.insert(overlayEntry);
+    Future.delayed(const Duration(seconds: 3), () => overlayEntry.remove());
+  }
+
   Future<void> _handleMediaPick(bool isVideo) async {
     final XFile? pickedFile = isVideo
         ? await _picker.pickVideo(source: ImageSource.gallery)
@@ -53,9 +135,7 @@ class _ReportScreenState extends State<ReportScreen> {
     }
   }
 
-  Future<void> _handleSubmit() async {
-    if (_selectedReason == null || _isSubmitting) return;
-
+  Future<void> _executeSubmit() async {
     setState(() => _isSubmitting = true);
 
     try {
@@ -75,13 +155,8 @@ class _ReportScreenState extends State<ReportScreen> {
 
       if (!mounted) return;
 
+      _showSuccessNotification(context);
       Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Report submitted successfully."),
-          backgroundColor: Colors.redAccent,
-        ),
-      );
     } catch (e) {
       setState(() => _isSubmitting = false);
       if (!mounted) return;
@@ -89,6 +164,20 @@ class _ReportScreenState extends State<ReportScreen> {
         SnackBar(content: Text("Error: $e"), backgroundColor: Colors.black),
       );
     }
+  }
+
+  void _handleSubmit() {
+    if (_selectedReason == null || _isSubmitting) return;
+
+    showDialog(
+      context: context,
+      builder: (context) => ConfirmationDialog(
+        title: "Submit Report",
+        content: "Are you sure you want to submit this report?",
+        confirmText: "Submit Report",
+        onConfirm: _executeSubmit,
+      ),
+    );
   }
 
   @override

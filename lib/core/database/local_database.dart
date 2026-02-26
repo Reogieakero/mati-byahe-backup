@@ -195,4 +195,16 @@ class LocalDatabase {
     final db = await database;
     return await db.delete('trips', where: 'uuid = ?', whereArgs: [uuid]);
   }
+
+  Future<List<Map<String, dynamic>>> getReportHistory(
+    String passengerId,
+  ) async {
+    final db = await database;
+    return await db.query(
+      'reports',
+      where: 'passenger_id = ?',
+      whereArgs: [passengerId],
+      orderBy: 'id DESC', // Show newest reports first
+    );
+  }
 }
