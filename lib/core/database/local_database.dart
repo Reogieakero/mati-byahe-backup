@@ -154,4 +154,9 @@ class LocalDatabase {
     final db = await database;
     await db.delete('active_fare', where: 'email = ?', whereArgs: [email]);
   }
+
+  Future<int> deleteTrip(String uuid) async {
+    final db = await database;
+    return await db.delete('trips', where: 'uuid = ?', whereArgs: [uuid]);
+  }
 }

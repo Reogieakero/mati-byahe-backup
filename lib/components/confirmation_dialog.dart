@@ -19,7 +19,8 @@ class ConfirmationDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final bool isDestructive =
         confirmText.toLowerCase().contains('change') ||
-        confirmText.toLowerCase().contains('cancel');
+        confirmText.toLowerCase().contains('cancel') ||
+        confirmText.toLowerCase().contains('delete');
 
     return AlertDialog(
       backgroundColor: Colors.white,

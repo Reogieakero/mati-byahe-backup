@@ -5,6 +5,7 @@ import '../core/database/local_database.dart';
 import '../core/services/trip_service.dart';
 import 'widgets/history_header.dart';
 import 'widgets/history_tile.dart';
+import '../components/confirmation_dialog.dart';
 
 class HistoryScreen extends StatefulWidget {
   final String email;
@@ -67,7 +68,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         }
 
                         if (snapshot.hasError) {
-                          return Center(child: Text("Error loading history"));
+                          return const Center(
+                            child: Text("Error loading history"),
+                          );
                         }
 
                         final trips = snapshot.data ?? [];
@@ -83,7 +86,28 @@ class _HistoryScreenState extends State<HistoryScreen> {
                             physics: const AlwaysScrollableScrollPhysics(),
                             itemCount: trips.length,
                             itemBuilder: (context, index) {
-                              return HistoryTile(trip: trips[index]);
+                              final trip = trips[index];
+                              return HistoryTile(
+                                trip: trip,
+                                onDelete: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => ConfirmationDialog(
+                                      title: "Delete Trip",
+                                      content:
+                                          "Are you sure you want to delete this trip record? This cannot be undone.",
+                                      confirmText: "Delete",
+                                      onConfirm: () async {
+                                        await _tripService.deleteTrip(
+                                          trip['uuid'],
+                                        );
+                                        if (mounted) setState(() {});
+                                      },
+                                    ),
+                                  );
+                                },
+                                onViewDetails: () {},
+                              );
                             },
                           ),
                         );
