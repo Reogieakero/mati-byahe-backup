@@ -43,12 +43,28 @@ class _QrScannerViewState extends State<QrScannerView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text('Scan QR Code'),
-        centerTitle: true,
-        backgroundColor: AppColors.primaryBlue,
-        foregroundColor: Colors.white,
+        backgroundColor: Colors.white,
         elevation: 0,
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: AppColors.darkNavy,
+            size: 20,
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: const Text(
+          "SCAN QR CODE",
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w900,
+            letterSpacing: 2.0,
+            color: AppColors.darkNavy,
+          ),
+        ),
       ),
       body: Stack(
         children: [
@@ -66,9 +82,10 @@ class _QrScannerViewState extends State<QrScannerView> {
                       size: 48,
                     ),
                     const SizedBox(height: 16),
-                    Text(
+                    const Text(
                       'Camera Error',
-                      style: const TextStyle(
+                      style: TextStyle(
+                        color: Colors.white,
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
@@ -77,52 +94,90 @@ class _QrScannerViewState extends State<QrScannerView> {
                     Text(
                       error.toString(),
                       textAlign: TextAlign.center,
-                      style: const TextStyle(fontSize: 14),
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14,
+                      ),
                     ),
                   ],
                 ),
               );
             },
           ),
+          _buildOverlay(context),
           Positioned(
-            top: 0,
+            bottom: 80,
             left: 0,
             right: 0,
-            bottom: 0,
-            child: IgnorePointer(
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: AppColors.primaryYellow, width: 3),
+            child: Column(
+              children: [
+                const Text(
+                  "Align QR code within the frame",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-              ),
-            ),
-          ),
-          Center(
-            child: Container(
-              width: 250,
-              height: 250,
-              decoration: BoxDecoration(
-                border: Border.all(color: AppColors.primaryYellow, width: 3),
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: 50,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: FloatingActionButton(
-                backgroundColor: AppColors.primaryYellow,
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Icon(Icons.close, color: AppColors.darkNavy),
-              ),
+                const SizedBox(height: 24),
+                FloatingActionButton(
+                  backgroundColor: Colors.white,
+                  onPressed: () => controller.toggleTorch(),
+                  child: const Icon(
+                    Icons.flashlight_on_rounded,
+                    color: AppColors.darkNavy,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildOverlay(BuildContext context) {
+    return Stack(
+      children: [
+        ColorFiltered(
+          colorFilter: ColorFilter.mode(
+            Colors.black.withValues(alpha: 0.6),
+            BlendMode.srcOut,
+          ),
+          child: Stack(
+            children: [
+              Container(
+                decoration: const BoxDecoration(
+                  color: Colors.black,
+                  backgroundBlendMode: BlendMode.dstOut,
+                ),
+              ),
+              Align(
+                alignment: Alignment.center,
+                child: Container(
+                  width: 250,
+                  height: 250,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        Align(
+          alignment: Alignment.center,
+          child: Container(
+            width: 250,
+            height: 250,
+            decoration: BoxDecoration(
+              border: Border.all(color: AppColors.primaryYellow, width: 4),
+              borderRadius: BorderRadius.circular(20),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
