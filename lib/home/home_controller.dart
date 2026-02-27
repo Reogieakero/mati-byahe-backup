@@ -65,6 +65,17 @@ class HomeController {
     const String mockDriver = "Lito Lapid";
     final String endTime = DateTime.now().toIso8601String();
 
+    if (currentUser != null) {
+      try {
+        await _supabase.from('profiles').upsert({
+          'id': currentUser.id,
+          'email': email,
+        });
+      } catch (e) {
+        debugPrint("Profile sync skipped: $e");
+      }
+    }
+
     await _localDb.saveTrip(
       email: email,
       pickup: pickup,

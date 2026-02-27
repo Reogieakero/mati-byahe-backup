@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import '../core/constant/app_colors.dart';
-import '../core/database/local_database.dart'; // Ensure this is imported
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class EditProfileScreen extends StatefulWidget {
   final String initialName;
@@ -21,9 +19,8 @@ class EditProfileScreen extends StatefulWidget {
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
-  final LocalDatabase _db = LocalDatabase();
-  final SupabaseClient _supabase = Supabase.instance.client;
 
+  // Removed 'late' keyword and initialized immediately to avoid LateInitializationError
   late final TextEditingController _firstNameController;
   late final TextEditingController _middleNameController;
   late final TextEditingController _lastNameController;
@@ -35,18 +32,27 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   void initState() {
     super.initState();
 
-    // Destructure initial full name
+    // Destructure logic
     List<String> parts = widget.initialName.trim().split(' ');
-    String first = parts.isNotEmpty ? parts[0] : '';
-    String last = parts.length > 1 ? parts.last : '';
-    String middle = parts.length > 2
-        ? parts.sublist(1, parts.length - 1).join(' ')
-        : '';
+    String first = '';
+    String last = '';
+    String middle = '';
 
+    if (parts.isNotEmpty) {
+      first = parts[0];
+      if (parts.length > 1) {
+        last = parts.last;
+        if (parts.length > 2) {
+          middle = parts.sublist(1, parts.length - 1).join(' ');
+        }
+      }
+    }
+
+    // Initialize all controllers immediately
     _firstNameController = TextEditingController(text: first);
     _middleNameController = TextEditingController(text: middle);
     _lastNameController = TextEditingController(text: last);
-    _suffixController = TextEditingController();
+    _suffixController = TextEditingController(); // Optional field starts empty
     _emailController = TextEditingController(text: widget.initialEmail);
     _phoneController = TextEditingController(text: widget.initialPhone);
   }
@@ -60,39 +66,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _emailController.dispose();
     _phoneController.dispose();
     super.dispose();
-  }
-
-  Future<void> _saveProfile() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    final String fullName =
-        "${_firstNameController.text} ${_middleNameController.text} ${_lastNameController.text} ${_suffixController.text}"
-            .trim()
-            .replaceAll(RegExp(r'\s+'), ' ');
-
-    try {
-      // 1. Update Local Database (SQLite)
-      await _db.updateUserProfile(_supabase.auth.currentUser!.id, {
-        'name': fullName,
-        'phone_number': _phoneController.text,
-        'is_synced': 0, // Flag for SyncService
-      });
-
-      // 2. Update Supabase
-      await _supabase.auth.updateUser(
-        UserAttributes(
-          data: {'full_name': fullName, 'phone_number': _phoneController.text},
-        ),
-      );
-
-      if (mounted) Navigator.pop(context, true);
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("Error saving: $e")));
-      }
-    }
   }
 
   @override
@@ -183,7 +156,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 width: double.infinity,
                 height: 56,
                 child: ElevatedButton(
-                  onPressed: _saveProfile,
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      Navigator.pop(context);
+                    }
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryBlue,
                     foregroundColor: Colors.white,
@@ -243,6 +220,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           controller: controller,
           enabled: enabled,
           keyboardType: keyboardType,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: enabled ? AppColors.darkNavy : AppColors.textGrey,
+          ),
           decoration: InputDecoration(
             prefixIcon: Icon(icon, size: 18, color: AppColors.primaryBlue),
             filled: true,

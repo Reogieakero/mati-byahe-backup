@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../database/local_database.dart';
 
@@ -12,14 +13,11 @@ class SyncService {
         'google.com',
       ).timeout(const Duration(seconds: 5));
       if (result.isEmpty || result[0].rawAddress.isEmpty) return;
-
       final db = await _localDb.database;
-
       await _syncTrips(db);
       await _syncReports(db);
-      await _syncDeletedReports(db);
     } catch (e) {
-      print("Sync error: $e");
+      debugPrint("Sync error: $e");
     }
   }
 
@@ -30,12 +28,31 @@ class SyncService {
       whereArgs: [0],
     );
 
+    final currentUser = _supabase.auth.currentUser;
+    if (currentUser == null) return;
+
+    try {
+      await _supabase.rpc(
+        'handle_sync_profile',
+        params: {'p_id': currentUser.id, 'p_email': currentUser.email},
+      );
+    } catch (e) {
+      debugPrint("Profile RPC failed, attempting manual upsert: $e");
+      try {
+        await _supabase.from('profiles').upsert({
+          'id': currentUser.id,
+          'email': currentUser.email,
+        }, onConflict: 'id');
+      } catch (e2) {
+        debugPrint("Manual upsert also failed: $e2");
+      }
+    }
+
     for (var data in unsynced) {
       try {
         await _supabase.from('trips').upsert({
           'uuid': data['uuid'],
-          'passenger_id': data['passenger_id'],
-          'driver_id': data['driver_id'],
+          'passenger_id': currentUser.id,
           'driver_name': data['driver_name'],
           'pickup': data['pickup'],
           'drop_off': data['drop_off'],
@@ -50,11 +67,11 @@ class SyncService {
         await db.update(
           'trips',
           {'is_synced': 1},
-          where: 'id = ?',
-          whereArgs: [data['id']],
+          where: 'uuid = ?',
+          whereArgs: [data['uuid']],
         );
       } catch (e) {
-        continue;
+        debugPrint("Trip sync error: $e");
       }
     }
   }
@@ -62,36 +79,19 @@ class SyncService {
   Future<void> _syncReports(db) async {
     final List<Map<String, dynamic>> unsyncedReports = await db.query(
       'reports',
-      where: 'is_synced = ? AND is_deleted = 0',
+      where: 'is_synced = ?',
       whereArgs: [0],
     );
 
     for (var data in unsyncedReports) {
       try {
-        String? finalMediaUrl = data['evidence_url'];
-
-        if (finalMediaUrl != null &&
-            finalMediaUrl.isNotEmpty &&
-            !finalMediaUrl.startsWith('http')) {
-          final file = File(finalMediaUrl);
-          if (await file.exists()) {
-            final extension = finalMediaUrl.split('.').last;
-            final fileName =
-                'report_${DateTime.now().millisecondsSinceEpoch}.$extension';
-            await _supabase.storage
-                .from('report-evidence')
-                .upload(fileName, file);
-            finalMediaUrl = _supabase.storage
-                .from('report-evidence')
-                .getPublicUrl(fileName);
-          }
-        }
-
         final tripData = await _supabase
             .from('trips')
             .select('id')
             .eq('uuid', data['trip_uuid'])
-            .single();
+            .maybeSingle();
+
+        if (tripData == null) continue;
 
         await _supabase.from('reports').upsert({
           'trip_id': tripData['id'],
@@ -99,7 +99,6 @@ class SyncService {
           'passenger_id': data['passenger_id'],
           'issue_type': data['issue_type'],
           'description': data['description'],
-          'evidence_url': finalMediaUrl,
           'status': data['status'],
           'reported_at': data['reported_at'],
         }, onConflict: 'trip_uuid');
@@ -111,7 +110,7 @@ class SyncService {
           whereArgs: [data['id']],
         );
       } catch (e) {
-        continue;
+        debugPrint("Report sync error: $e");
       }
     }
   }

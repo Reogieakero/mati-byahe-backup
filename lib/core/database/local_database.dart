@@ -23,19 +23,28 @@ class LocalDatabase {
     String pathName = join(dbPath, 'byahe.db');
     return await openDatabase(
       pathName,
-      version: 21,
+      version: 20,
       onCreate: (db, version) async => await _createTables(db),
       onUpgrade: (db, oldVersion, newVersion) async {
-        if (oldVersion < 21) {
-          await db.execute('DROP TABLE IF EXISTS users');
-          await _createUsersTable(db);
+        if (oldVersion < 20) {
+          await db.execute('DROP TABLE IF EXISTS reports');
+          await _createReportsTable(db);
         }
       },
     );
   }
 
   Future<void> _createTables(Database db) async {
-    await _createUsersTable(db);
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS users(
+        id TEXT PRIMARY KEY,
+        email TEXT UNIQUE,
+        password TEXT,
+        role TEXT,
+        is_verified INTEGER DEFAULT 0,
+        is_synced INTEGER DEFAULT 0
+      )
+    ''');
 
     await db.execute('''
       CREATE TABLE IF NOT EXISTS active_fare(
@@ -68,23 +77,6 @@ class LocalDatabase {
     ''');
 
     await _createReportsTable(db);
-  }
-
-  Future<void> _createUsersTable(Database db) async {
-    await db.execute('''
-      CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        uuid TEXT UNIQUE NOT NULL,
-        phone_number TEXT UNIQUE NOT NULL,
-        name TEXT NOT NULL,
-        email TEXT NOT NULL,
-        role TEXT NOT NULL CHECK (role IN ('passenger', 'driver')),
-        password_hash TEXT NOT NULL,
-        created_at TEXT NOT NULL,
-        updated_at TEXT NOT NULL,
-        is_synced INTEGER DEFAULT 0
-      )
-    ''');
   }
 
   Future<void> _createReportsTable(Database db) async {

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../database/local_database.dart';
 
@@ -11,7 +12,6 @@ class TripService {
       final currentUser = _supabase.auth.currentUser;
       if (currentUser == null) return;
 
-      // 1. PUSH: Sync local trips to cloud
       final List<Map<String, dynamic>> unsynced = await db.query(
         'trips',
         where: 'is_synced = ?',
@@ -20,10 +20,11 @@ class TripService {
 
       for (var data in unsynced) {
         try {
-          await _supabase.from('trips').insert({
+          await _supabase.from('trips').upsert({
             'uuid': data['uuid'],
-            'passenger_id': currentUser.id, // Using active session ID
+            'passenger_id': data['passenger_id'] ?? currentUser.id,
             'driver_id': data['driver_id'],
+            'driver_name': data['driver_name'],
             'pickup': data['pickup'],
             'drop_off': data['drop_off'],
             'calculated_fare': data['fare'],
@@ -32,14 +33,16 @@ class TripService {
             'end_datetime': data['end_time'],
             'created_at': data['date'],
             'status': 'completed',
-          });
+          }, onConflict: 'uuid');
+
           await db.update(
             'trips',
             {'is_synced': 1},
-            where: 'id = ?',
-            whereArgs: [data['id']],
+            where: 'uuid = ?',
+            whereArgs: [data['uuid']],
           );
         } catch (e) {
+          debugPrint("Upsert error: $e");
           continue;
         }
       }
@@ -47,7 +50,9 @@ class TripService {
       final cloudTrips = await _supabase
           .from('trips')
           .select()
-          .eq('passenger_id', currentUser.id) // Query by UUID
+          .or(
+            'passenger_id.eq.${currentUser.id},driver_id.eq.${currentUser.id}',
+          )
           .order('created_at', ascending: false);
 
       for (var cloudTrip in cloudTrips) {
@@ -60,9 +65,9 @@ class TripService {
         if (localExists.isEmpty) {
           await db.insert('trips', {
             'uuid': cloudTrip['uuid'],
-            'passenger_id': cloudTrip['passenger_id'], // Store UUID locally
-            'email': currentUser.email,
+            'passenger_id': cloudTrip['passenger_id'],
             'driver_id': cloudTrip['driver_id'],
+            'email': currentUser.email,
             'pickup': cloudTrip['pickup'],
             'drop_off': cloudTrip['drop_off'],
             'fare': cloudTrip['calculated_fare'],
@@ -75,18 +80,16 @@ class TripService {
         }
       }
     } catch (e) {
-      print("Sync Error: $e");
+      debugPrint("Sync Error: $e");
     }
   }
 
   Future<void> deleteTrip(String uuid) async {
     try {
       await _supabase.from('trips').delete().eq('uuid', uuid);
-
       await _localDb.deleteTrip(uuid);
     } catch (e) {
       await _localDb.deleteTrip(uuid);
-      print("Cloud delete failed, but local trip removed: $e");
     }
   }
 }
