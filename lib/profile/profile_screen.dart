@@ -22,9 +22,10 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   final LocalDatabase _localDb = LocalDatabase();
   final AuthService _authService = AuthService();
+  final _supabase = Supabase.instance.client;
+
   String? _userName;
   String? _userPhone;
-  String? _lastUpdate;
   bool _isLoading = true;
 
   @override
@@ -34,44 +35,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _fetchUserData() async {
-    final String? userId = Supabase.instance.client.auth.currentUser?.id;
-    if (userId != null) {
-      final userData = await _localDb.getUserById(userId);
+    final user = _supabase.auth.currentUser;
+    if (user == null) return;
+
+    try {
+      final data = await _supabase
+          .from('profiles')
+          .select('full_name, phone_number')
+          .eq('id', user.id)
+          .maybeSingle();
+
       if (mounted) {
         setState(() {
-          _userName = userData?['full_name'];
-          _userPhone = userData?['phone_number'];
-          _lastUpdate = userData?['last_profile_update'];
+          _userName = data?['full_name'];
+          _userPhone = data?['phone_number'];
+          _isLoading = false;
+        });
+      }
+
+      if (data != null) {
+        await _localDb.updateUserProfile(
+          id: user.id,
+          name: _userName ?? "",
+          phone: _userPhone ?? "",
+        );
+      }
+    } catch (e) {
+      final localData = await _localDb.getUserById(user.id);
+      if (mounted) {
+        setState(() {
+          _userName = localData?['full_name'];
+          _userPhone = localData?['phone_number'];
           _isLoading = false;
         });
       }
     }
-  }
-
-  bool _canEdit() {
-    if (_lastUpdate == null || _lastUpdate!.isEmpty) return true;
-    final lastDate = DateTime.parse(_lastUpdate!);
-    return DateTime.now().difference(lastDate).inDays >= 14;
-  }
-
-  int _daysRemaining() {
-    if (_lastUpdate == null) return 0;
-    final lastDate = DateTime.parse(_lastUpdate!);
-    int diff = DateTime.now().difference(lastDate).inDays;
-    return 14 - diff;
-  }
-
-  void _showCooldownDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => ConfirmationDialog(
-        title: "Profile Locked",
-        content:
-            "To maintain security, profile changes are allowed once every 14 days. You can update your profile again in ${_daysRemaining()} days.",
-        confirmText: "Understood",
-        onConfirm: () {},
-      ),
-    );
   }
 
   void _handleLogout() {
@@ -117,28 +115,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
               slivers: [
                 _buildSliverAppBar(),
                 SliverPadding(
-                  // SET TO 15 PIXELS GUTTER
                   padding: const EdgeInsets.fromLTRB(15, 0, 15, 30),
                   sliver: SliverList(
                     delegate: SliverChildListDelegate([
                       const SizedBox(height: 20),
                       ProfileHeader(
                         email: widget.email,
-                        name: _userName,
+                        name: _userName ?? "Set your name",
                         role: widget.role,
                       ),
                       const SizedBox(height: 32),
-
                       _buildSectionLabel("ACCOUNT OVERVIEW"),
                       _buildContentCard(
                         child: ProfileMenuItem(
                           icon: Icons.person_outline_rounded,
                           title: 'Edit Profile',
                           onTap: () async {
-                            if (!_canEdit()) {
-                              _showCooldownDialog();
-                              return;
-                            }
                             final result = await Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -153,7 +145,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           },
                         ),
                       ),
-
                       const SizedBox(height: 24),
                       _buildSectionLabel("SUPPORT & LEGAL"),
                       _buildContentCard(
