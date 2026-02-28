@@ -14,7 +14,7 @@ class LoginInput extends StatelessWidget {
     required this.label,
     this.obscureText = false,
     this.suffix,
-    this.radius = 12.0,
+    this.radius = 50,
   });
 
   @override

@@ -45,7 +45,7 @@ class RoleSelector extends StatelessWidget {
       children: [
         Expanded(child: _roleToggle('Passenger')),
         const SizedBox(width: 16),
-        Expanded(child: _roleToggle('Rider')),
+        Expanded(child: _roleToggle('Driver')),
       ],
     );
   }

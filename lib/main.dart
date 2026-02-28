@@ -69,7 +69,6 @@ class MyApp extends StatelessWidget {
   Widget _getInitialScreen() {
     if (!onboardingCompleted) return const OnboardingScreen();
 
-    // If activeUser exists, skip PIN and go to Main Navigation
     if (activeUser != null) {
       return MainNavigation(
         email: activeUser!['email'],

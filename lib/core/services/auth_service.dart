@@ -23,7 +23,7 @@ class AuthService {
             .eq('id', res.user!.id)
             .maybeSingle();
 
-        final String role = profileData?['role'] ?? 'passenger';
+        final String role = profileData?['role'] ?? 'Unknown';
 
         final db = await _localDb.database;
         await db.insert('users', {

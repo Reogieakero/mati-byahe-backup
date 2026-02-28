@@ -7,14 +7,13 @@ import '../core/constant/app_texts.dart';
 
 class NavigationScreens {
   static List<Widget> getScreens(String email, String role) {
-    final bool isDriver = role.toLowerCase() == 'driver';
+    final String normalizedRole = role.toLowerCase();
 
-    if (isDriver) {
+    if (normalizedRole == 'driver') {
       return [
         HomeScreen(email: email, role: role),
         _placeholder(AppTexts.navEarnings),
         _placeholder(AppTexts.navVehicle),
-        _placeholder("REPORTS"), // Added to ensure list length is 5
         ProfileScreen(email: email, role: role),
       ];
     }

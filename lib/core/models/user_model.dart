@@ -5,10 +5,7 @@ class UserModel {
   UserModel({required this.email, required this.role});
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
-    return UserModel(
-      email: map['email'] ?? '',
-      role: map['role'] ?? 'Passenger',
-    );
+    return UserModel(email: map['email'] ?? '', role: map['role'] ?? 'Unknown');
   }
 
   bool get isDriver => role.toLowerCase() == 'driver';
