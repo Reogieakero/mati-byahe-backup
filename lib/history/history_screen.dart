@@ -5,6 +5,7 @@ import '../core/database/local_database.dart';
 import '../core/services/trip_service.dart';
 import 'widgets/history_header.dart';
 import 'widgets/history_tile.dart';
+import 'widgets/history_empty_state.dart';
 import 'history_details_screen.dart';
 import '../../components/confirmation_dialog.dart';
 
@@ -56,7 +57,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
             const HistoryHeader(),
             Expanded(
               child: userId == null
-                  ? _buildEmptyState()
+                  ? _buildScrollableEmptyState()
                   : FutureBuilder<List<Map<String, dynamic>>>(
                       future: LocalDatabase().getTripsByPassengerId(userId),
                       builder: (context, snapshot) {
@@ -77,7 +78,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         final trips = snapshot.data ?? [];
 
                         if (trips.isEmpty) {
-                          return _buildEmptyState();
+                          return _buildScrollableEmptyState();
                         }
 
                         return RefreshIndicator(
@@ -129,23 +130,15 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+  Widget _buildScrollableEmptyState() {
+    return RefreshIndicator(
+      onRefresh: _triggerSync,
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
         children: [
-          Icon(
-            Icons.history_rounded,
-            size: 60,
-            color: AppColors.darkNavy.withOpacity(0.2),
-          ),
-          const SizedBox(height: 10),
-          const Text(
-            "No past trips found",
-            style: TextStyle(
-              color: AppColors.textGrey,
-              fontWeight: FontWeight.w500,
-            ),
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.7,
+            child: const HistoryEmptyState(),
           ),
         ],
       ),

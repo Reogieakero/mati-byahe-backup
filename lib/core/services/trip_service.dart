@@ -87,8 +87,11 @@ class TripService {
   Future<void> deleteTrip(String uuid) async {
     try {
       await _supabase.from('trips').delete().eq('uuid', uuid);
+
       await _localDb.deleteTrip(uuid);
+      debugPrint("Trip $uuid deleted from cloud and local.");
     } catch (e) {
+      debugPrint("Cloud delete error: $e");
       await _localDb.deleteTrip(uuid);
     }
   }

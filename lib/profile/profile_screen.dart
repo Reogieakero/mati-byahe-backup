@@ -26,15 +26,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final LocalDatabase _localDb = LocalDatabase();
   final AuthService _authService = AuthService();
   final _supabase = Supabase.instance.client;
+  final ScrollController _scrollController = ScrollController();
 
   String? _userName;
   String? _userPhone;
   bool _isLoading = true;
+  double _scrollOffset = 0.0;
 
   @override
   void initState() {
     super.initState();
     _fetchUserData();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.offset <= 50) {
+      setState(() {
+        _scrollOffset = _scrollController.offset;
+      });
+    } else if (_scrollOffset < 50) {
+      setState(() {
+        _scrollOffset = 50;
+      });
+    }
   }
 
   Future<void> _fetchUserData() async {
@@ -114,6 +136,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _buildGradientBackground(),
           SafeArea(
             child: CustomScrollView(
+              controller: _scrollController,
               physics: const BouncingScrollPhysics(),
               slivers: [
                 _buildSliverAppBar(),
@@ -234,22 +257,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
     ),
   );
 
-  Widget _buildSliverAppBar() => const SliverAppBar(
-    backgroundColor: Colors.transparent,
-    elevation: 0,
-    pinned: true,
-    centerTitle: true,
-    automaticallyImplyLeading: false,
-    title: Text(
-      "MY ACCOUNT",
-      style: TextStyle(
-        fontSize: 12,
-        fontWeight: FontWeight.w900,
-        letterSpacing: 2.0,
-        color: AppColors.darkNavy,
+  Widget _buildSliverAppBar() {
+    bool isScrolled = _scrollOffset > 10;
+
+    return SliverAppBar(
+      backgroundColor: isScrolled ? Colors.white : Colors.transparent,
+      elevation: isScrolled ? 1 : 0,
+      scrolledUnderElevation: 0,
+      shadowColor: Colors.black.withOpacity(0.2),
+      surfaceTintColor: Colors.white,
+      pinned: true,
+      centerTitle: true,
+      automaticallyImplyLeading: false,
+      title: Text(
+        "PROFILE",
+        style: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w900,
+          letterSpacing: 2.0,
+          color: AppColors.darkNavy,
+        ),
       ),
-    ),
-  );
+    );
+  }
 
   Widget _buildSectionLabel(String title) => Padding(
     padding: const EdgeInsets.only(left: 4, bottom: 12),

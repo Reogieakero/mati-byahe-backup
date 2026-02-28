@@ -6,20 +6,21 @@ class ReportHistoryAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppBar(
-      automaticallyImplyLeading: false,
-      title: const Text(
-        "REPORT HISTORY",
-        style: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w900,
-          letterSpacing: 1.2,
-          color: AppColors.darkNavy,
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(10, 50, 10, 15),
+      decoration: const BoxDecoration(color: Colors.transparent),
+      child: const Center(
+        child: Text(
+          'REPORT HISTORY',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w900,
+            color: AppColors.darkNavy,
+            letterSpacing: 2.0,
+          ),
         ),
       ),
-      centerTitle: true,
-      backgroundColor: Colors.transparent,
-      elevation: 0,
     );
   }
 }

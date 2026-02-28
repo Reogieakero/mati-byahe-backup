@@ -92,12 +92,14 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
                     return RefreshIndicator(
                       onRefresh: _triggerSync,
                       color: Colors.redAccent,
-                      child: SingleChildScrollView(
+                      child: ListView(
                         physics: const AlwaysScrollableScrollPhysics(),
-                        child: SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.7,
-                          child: const ReportHistoryEmptyState(),
-                        ),
+                        children: [
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.7,
+                            child: const ReportHistoryEmptyState(),
+                          ),
+                        ],
                       ),
                     );
                   }
