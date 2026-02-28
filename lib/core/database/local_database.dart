@@ -23,7 +23,7 @@ class LocalDatabase {
     String pathName = join(dbPath, 'byahe.db');
     return await openDatabase(
       pathName,
-      version: 22,
+      version: 23,
       onCreate: (db, version) async => await _createTables(db),
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 21) {
@@ -39,6 +39,13 @@ class LocalDatabase {
             await db.execute('ALTER TABLE users ADD COLUMN phone_number TEXT');
           } catch (e) {}
         }
+        if (oldVersion < 23) {
+          try {
+            await db.execute(
+              'ALTER TABLE users ADD COLUMN last_profile_update TEXT',
+            );
+          } catch (e) {}
+        }
       },
     );
   }
@@ -52,6 +59,7 @@ class LocalDatabase {
         full_name TEXT,
         phone_number TEXT,
         role TEXT,
+        last_profile_update TEXT,
         is_verified INTEGER DEFAULT 0,
         is_synced INTEGER DEFAULT 1
       )

@@ -21,7 +21,10 @@ class ConfirmationDialog extends StatelessWidget {
         confirmText.toLowerCase().contains('change') ||
         confirmText.toLowerCase().contains('cancel') ||
         confirmText.toLowerCase().contains('delete') ||
-        confirmText.toLowerCase().contains('report');
+        confirmText.toLowerCase().contains('report') ||
+        confirmText.toLowerCase().contains('logout');
+
+    final bool isLock = title.toLowerCase().contains('lock');
 
     return AlertDialog(
       backgroundColor: Colors.white,
@@ -37,7 +40,9 @@ class ConfirmationDialog extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             color: isDestructive
                 ? Colors.red.withOpacity(0.08)
-                : Colors.transparent,
+                : (isLock
+                      ? AppColors.primaryBlue.withOpacity(0.05)
+                      : Colors.transparent),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -46,7 +51,9 @@ class ConfirmationDialog extends StatelessWidget {
                   child: Icon(
                     isDestructive
                         ? Icons.warning_amber_rounded
-                        : Icons.help_outline_rounded,
+                        : (isLock
+                              ? Icons.lock_clock_outlined
+                              : Icons.help_outline_rounded),
                     color: isDestructive
                         ? Colors.redAccent
                         : AppColors.primaryBlue,

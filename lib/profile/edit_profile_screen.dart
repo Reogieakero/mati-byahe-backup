@@ -130,7 +130,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         ),
       ),
       body: SingleChildScrollView(
-        // Updated gutter to 15px as requested
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 24),
         child: Form(
           key: _formKey,
@@ -150,7 +149,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 icon: Icons.person_pin_outlined,
               ),
               const SizedBox(height: 16),
-              // Name row with overflow protection
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -238,7 +236,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         const SizedBox(height: 8),
         DropdownButtonFormField<String>(
           value: _selectedSuffix,
-          isExpanded: true, // Prevents horizontal overflow
+          isExpanded: true,
           items: _suffixes.map((String value) {
             return DropdownMenuItem<String>(
               value: value,
@@ -249,11 +247,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ),
             );
           }).toList(),
-          onChanged: (newValue) {
-            setState(() {
-              _selectedSuffix = newValue!;
-            });
-          },
+          onChanged: (newValue) => setState(() => _selectedSuffix = newValue!),
           decoration: InputDecoration(
             prefixIcon: const Icon(
               Icons.more_horiz_rounded,

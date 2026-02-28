@@ -9,7 +9,12 @@ extension UserDatabase on LocalDatabase {
     final db = await database;
     await db.update(
       'users',
-      {'full_name': name, 'phone_number': phone, 'is_synced': 0},
+      {
+        'full_name': name,
+        'phone_number': phone,
+        'last_profile_update': DateTime.now().toIso8601String(),
+        'is_synced': 0,
+      },
       where: 'id = ?',
       whereArgs: [id],
     );
