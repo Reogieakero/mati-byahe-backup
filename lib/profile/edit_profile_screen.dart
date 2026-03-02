@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import '../core/constant/app_colors.dart';
+import '../core/database/local_database.dart'; // Ensure this is imported
 import '../components/confirmation_dialog.dart';
 import 'edit_profile_controller.dart';
 import 'widgets/profile_form_fields.dart';
 import 'widgets/suffix_dropdown.dart';
+import 'qr_code_screen.dart'; // Ensure this is imported
 
 class EditProfileScreen extends StatefulWidget {
   final String initialName;
@@ -56,13 +58,62 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         content: "Are you sure you want to save these changes?",
         confirmText: "Save",
         onConfirm: () async {
+          // Close the dialog first
+          Navigator.pop(context);
+
+          setState(() => _controller.isLoading = true);
+
           final success = await _controller.saveProfile();
+
           if (mounted) {
+            setState(() => _controller.isLoading = false);
+
             if (success) {
-              Navigator.pop(context, true);
-            } else {
+              // 1. Show Success SnackBar
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Error saving profile.")),
+                const SnackBar(
+                  content: Row(
+                    children: [
+                      Icon(Icons.check_circle_rounded, color: Colors.white),
+                      SizedBox(width: 12),
+                      Text("Profile saved successfully!"),
+                    ],
+                  ),
+                  backgroundColor: Colors.green,
+                  behavior: SnackBarBehavior.floating,
+                  duration: Duration(seconds: 2),
+                ),
+              );
+
+              // 2. Navigation Logic
+              if (widget.role.toLowerCase() == 'driver') {
+                final userId = _controller.getUserId();
+                if (userId != null) {
+                  // Fetch the latest updated data from local DB for the QR Screen
+                  final localData = await LocalDatabase().getUserById(userId);
+
+                  if (mounted && localData != null) {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            QRCodeScreen(driverData: localData),
+                      ),
+                    );
+                  }
+                }
+              } else {
+                // Passenger: Just go back
+                Navigator.pop(context, true);
+              }
+            } else {
+              // Error Feedback
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text("Error saving profile. Please try again."),
+                  backgroundColor: Colors.redAccent,
+                  behavior: SnackBarBehavior.floating,
+                ),
               );
             }
           }
@@ -74,7 +125,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     if (_controller.isLoading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(color: AppColors.primaryBlue),
+        ),
+      );
     }
 
     final bool isDriver = widget.role.toLowerCase() == 'driver';
@@ -215,7 +270,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 width: double.infinity,
                 height: 56,
                 child: ElevatedButton(
-                  onPressed: _handleSave,
+                  onPressed: _controller.isLoading ? null : _handleSave,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryBlue,
                     foregroundColor: Colors.white,
@@ -224,9 +279,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     elevation: 0,
                   ),
-                  child: const Text(
-                    "SAVE CHANGES",
-                    style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14),
+                  child: Text(
+                    _controller.isLoading ? "SAVING..." : "SAVE CHANGES",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 14,
+                    ),
                   ),
                 ),
               ),

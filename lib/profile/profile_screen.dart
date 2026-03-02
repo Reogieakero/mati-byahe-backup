@@ -11,6 +11,7 @@ import 'edit_profile_screen.dart';
 import 'guide_screen.dart';
 import 'legal_screen.dart';
 import 'set_pin_screen.dart';
+import 'qr_code_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String email;
@@ -83,6 +84,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
           id: user.id,
           name: _userName ?? "",
           phone: _userPhone ?? "",
+          plate: data['plate_number'],
+          color: data['vehicle_color'],
+          address: data['address'],
+          license: data['license_number'],
+          vehicleType: data['vehicle_type'],
         );
       }
     } catch (e) {
@@ -174,6 +180,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 if (result == true) _fetchUserData();
                               },
                             ),
+                            if (widget.role.toLowerCase() == 'driver') ...[
+                              _buildDivider(),
+                              ProfileMenuItem(
+                                icon: Icons.qr_code_2_rounded,
+                                title: 'My QR Code ID',
+                                onTap: () async {
+                                  final userId = _supabase.auth.currentUser?.id;
+                                  if (userId != null) {
+                                    final data = await _localDb.getUserById(
+                                      userId,
+                                    );
+                                    if (data != null && mounted) {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              QRCodeScreen(driverData: data),
+                                        ),
+                                      );
+                                    }
+                                  }
+                                },
+                              ),
+                            ],
                             _buildDivider(),
                             ProfileMenuItem(
                               icon: Icons.lock_outline_rounded,
@@ -261,7 +291,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildSliverAppBar() {
     bool isScrolled = _scrollOffset > 10;
-
     return SliverAppBar(
       backgroundColor: isScrolled ? Colors.white : Colors.transparent,
       elevation: isScrolled ? 1 : 0,

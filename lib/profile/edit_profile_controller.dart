@@ -88,7 +88,6 @@ class EditProfileController {
           break;
         }
       }
-
       if (parts.length == 1) {
         first = parts[0];
       } else if (parts.length == 2) {
@@ -120,6 +119,8 @@ class EditProfileController {
 
     try {
       final nowIso = DateTime.now().toUtc().toIso8601String();
+
+      // Update Supabase
       await _supabase
           .from('profiles')
           .update({
@@ -134,15 +135,25 @@ class EditProfileController {
           })
           .eq('id', userId);
 
+      // Update Local
       await _localDb.updateUserProfile(
         id: userId,
         name: fullNameString,
         phone: phoneController.text.trim(),
+        plate: plateNumberController.text.trim(),
+        color: vehicleColorController.text.trim(),
+        address: addressController.text.trim(),
+        license: licenseNumberController.text.trim(),
+        vehicleType: vehicleTypeController.text.trim(),
       );
       return true;
     } catch (e) {
       return false;
     }
+  }
+
+  String? getUserId() {
+    return _supabase.auth.currentUser?.id;
   }
 
   void dispose() {

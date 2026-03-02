@@ -22,32 +22,18 @@ class LocalDatabase {
 
     return await openDatabase(
       pathName,
-      version: 24,
+      version: 26, // Incremented version
       onCreate: (db, version) async => await _createTables(db),
       onUpgrade: (db, oldVersion, newVersion) async {
-        if (oldVersion < 21) {
+        if (oldVersion < 26) {
           try {
+            await db.execute('ALTER TABLE users ADD COLUMN plate_number TEXT');
+            await db.execute('ALTER TABLE users ADD COLUMN vehicle_color TEXT');
+            await db.execute('ALTER TABLE users ADD COLUMN address TEXT');
             await db.execute(
-              'ALTER TABLE reports ADD COLUMN is_unreported INTEGER DEFAULT 0',
+              'ALTER TABLE users ADD COLUMN license_number TEXT',
             );
-          } catch (e) {}
-        }
-        if (oldVersion < 22) {
-          try {
-            await db.execute('ALTER TABLE users ADD COLUMN full_name TEXT');
-            await db.execute('ALTER TABLE users ADD COLUMN phone_number TEXT');
-          } catch (e) {}
-        }
-        if (oldVersion < 23) {
-          try {
-            await db.execute(
-              'ALTER TABLE users ADD COLUMN last_profile_update TEXT',
-            );
-          } catch (e) {}
-        }
-        if (oldVersion < 24) {
-          try {
-            await db.execute('ALTER TABLE users ADD COLUMN login_pin TEXT');
+            await db.execute('ALTER TABLE users ADD COLUMN vehicle_type TEXT');
           } catch (e) {}
         }
       },
@@ -58,11 +44,15 @@ class LocalDatabase {
     await db.execute('''
       CREATE TABLE IF NOT EXISTS users(
         id TEXT PRIMARY KEY,
-        email TEXT UNIQUE,
-        password TEXT,
+        email TEXT,
         full_name TEXT,
         phone_number TEXT,
         role TEXT,
+        plate_number TEXT,
+        vehicle_color TEXT,
+        address TEXT,
+        license_number TEXT,
+        vehicle_type TEXT,
         login_pin TEXT,
         last_profile_update TEXT,
         is_verified INTEGER DEFAULT 0,
@@ -114,10 +104,9 @@ class LocalDatabase {
         description TEXT NOT NULL,
         evidence_url TEXT,
         status TEXT DEFAULT 'pending',
-        reported_at TEXT NOT NULL,
+        reported_at TEXT,
         is_synced INTEGER DEFAULT 0,
-        is_deleted INTEGER DEFAULT 0,
-        is_unreported INTEGER DEFAULT 0
+        is_deleted INTEGER DEFAULT 0
       )
     ''');
   }
