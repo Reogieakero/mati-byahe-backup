@@ -22,7 +22,7 @@ class LocalDatabase {
 
     return await openDatabase(
       pathName,
-      version: 26, // Incremented version
+      version: 27, // Incremented version to add driver_plate column
       onCreate: (db, version) async => await _createTables(db),
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 26) {
@@ -34,6 +34,11 @@ class LocalDatabase {
               'ALTER TABLE users ADD COLUMN license_number TEXT',
             );
             await db.execute('ALTER TABLE users ADD COLUMN vehicle_type TEXT');
+          } catch (e) {}
+        }
+        if (oldVersion < 27) {
+          try {
+            await db.execute('ALTER TABLE trips ADD COLUMN driver_plate TEXT');
           } catch (e) {}
         }
       },
@@ -78,13 +83,7 @@ class LocalDatabase {
         passenger_id TEXT,
         driver_id TEXT,
         driver_name TEXT,
-        email TEXT,
-        pickup TEXT,
-        drop_off TEXT,
-        fare REAL,
-        gas_tier TEXT,
-        date TEXT,
-        start_time TEXT,
+        driver_plate TEXT,
         end_time TEXT,
         is_synced INTEGER DEFAULT 0
       )

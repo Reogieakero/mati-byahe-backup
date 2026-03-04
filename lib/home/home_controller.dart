@@ -59,10 +59,11 @@ class HomeController {
     required String gasTier,
     required double fare,
     required String? startTime,
+    required String driverName,
+    required String? driverId,
     required Function() onCleared,
   }) async {
     final currentUser = _supabase.auth.currentUser;
-    const String mockDriver = "Lito Lapid";
     final String endTime = DateTime.now().toIso8601String();
 
     if (currentUser != null) {
@@ -83,7 +84,8 @@ class HomeController {
       fare: fare,
       gasTier: gasTier,
       passengerId: currentUser?.id,
-      driverName: mockDriver,
+      driverId: driverId,
+      driverName: driverName,
       startTime: startTime,
       endTime: endTime,
     );

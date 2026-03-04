@@ -1,7 +1,13 @@
 part of 'local_database.dart';
 
 extension TripDatabase on LocalDatabase {
-  Future<void> saveTrip({
+  /// Saves a trip locally.
+  ///
+  /// If [uuid] is provided we will use that value; otherwise a new one is
+  /// generated. The generated or provided uuid is returned so callers can
+  /// later update the same record (for example when completing the trip).
+  Future<String> saveTrip({
+    String? uuid,
     required String email,
     required String pickup,
     required String dropOff,
@@ -10,15 +16,18 @@ extension TripDatabase on LocalDatabase {
     String? passengerId,
     String? driverId,
     String? driverName,
+    String? driverPlate,
     String? startTime,
     String? endTime,
   }) async {
     final db = await database;
+    final tripUuid = uuid ?? const Uuid().v4();
     await db.insert('trips', {
-      'uuid': const Uuid().v4(),
+      'uuid': tripUuid,
       'passenger_id': passengerId,
       'driver_id': driverId,
       'driver_name': driverName,
+      'driver_plate': driverPlate,
       'email': email,
       'pickup': pickup,
       'drop_off': dropOff,
@@ -29,6 +38,21 @@ extension TripDatabase on LocalDatabase {
       'end_time': endTime,
       'is_synced': 0,
     });
+    return tripUuid;
+  }
+
+  Future<void> updateTripEnd({
+    required String uuid,
+    required String dropOff,
+    String? endTime,
+  }) async {
+    final db = await database;
+    await db.update(
+      'trips',
+      {'drop_off': dropOff, 'end_time': endTime, 'is_synced': 0},
+      where: 'uuid = ?',
+      whereArgs: [uuid],
+    );
   }
 
   Future<List<Map<String, dynamic>>> getTrips(String email) async {

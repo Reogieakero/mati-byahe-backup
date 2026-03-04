@@ -20,7 +20,9 @@ class TripService {
 
       for (var data in unsynced) {
         try {
-          await _supabase.from('trips').upsert({
+          // build payload dynamically so we don't include driver_plate if
+          // the cloud table hasn't been updated yet (avoids PGRST204 errors).
+          final payload = {
             'uuid': data['uuid'],
             'passenger_id': data['passenger_id'] ?? currentUser.id,
             'driver_id': data['driver_id'],
@@ -33,7 +35,12 @@ class TripService {
             'end_datetime': data['end_time'],
             'created_at': data['date'],
             'status': 'completed',
-          }, onConflict: 'uuid');
+          };
+          if (data['driver_plate'] != null) {
+            payload['driver_plate'] = data['driver_plate'];
+          }
+
+          await _supabase.from('trips').upsert(payload, onConflict: 'uuid');
 
           await db.update(
             'trips',
@@ -63,10 +70,13 @@ class TripService {
         );
 
         if (localExists.isEmpty) {
+          // cloudTrip may not have driver_plate field yet if the server schema
+          // hasn't been migrated; use null-aware operator to avoid errors.
           await db.insert('trips', {
             'uuid': cloudTrip['uuid'],
             'passenger_id': cloudTrip['passenger_id'],
             'driver_id': cloudTrip['driver_id'],
+            'driver_plate': cloudTrip['driver_plate'] ?? '',
             'email': currentUser.email,
             'pickup': cloudTrip['pickup'],
             'drop_off': cloudTrip['drop_off'],

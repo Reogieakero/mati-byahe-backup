@@ -126,11 +126,11 @@ class _HomeScreenState extends State<HomeScreen>
               children: [
                 const SizedBox(height: 10),
                 DashboardCards(
-                  tripCount: 4,
+                  tripCount: 0,
                   driverName: widget.role.toLowerCase() == 'driver'
                       ? "You"
-                      : "Lito Lapid",
-                  plateNumber: "CLB 4930",
+                      : "Searching...",
+                  plateNumber: "--- ---",
                   email: widget.email,
                   role: widget.role,
                 ),
@@ -164,6 +164,8 @@ class _HomeScreenState extends State<HomeScreen>
           gasTier: _activeTripData?['gas_tier'] ?? "N/A",
           fare: fareValue,
           startTime: _activeTripData?['start_time'],
+          driverName: "None Assigned",
+          driverId: null,
           onCleared: () => setState(() => _activeTripData = null),
         );
       }),
@@ -175,6 +177,8 @@ class _HomeScreenState extends State<HomeScreen>
           gasTier: "N/A",
           fare: 0.0,
           startTime: _activeTripData?['start_time'],
+          driverName: "Cancelled",
+          driverId: null,
           onCleared: () => setState(() => _activeTripData = null),
         );
       }),

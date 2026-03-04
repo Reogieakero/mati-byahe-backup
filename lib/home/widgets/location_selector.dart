@@ -13,11 +13,14 @@ class LocationSelector extends StatefulWidget {
   final String role;
   final Function(double) onFareCalculated;
 
+  final Function(Map<String, dynamic>)? onTripStarted;
+
   const LocationSelector({
     super.key,
     required this.email,
     required this.role,
     required this.onFareCalculated,
+    this.onTripStarted,
   });
 
   @override
@@ -199,6 +202,16 @@ class _LocationSelectorState extends State<LocationSelector> {
                   dropOff: _drop!,
                   gasTier: _selectedGasTier,
                   onSuccess: (val) {
+                    // notify parent that the trip has started first, so
+                    // pickup/dropoff are available when they react.
+                    if (widget.onTripStarted != null) {
+                      widget.onTripStarted!({
+                        'fare': fare,
+                        'pickup': _pickup,
+                        'dropOff': _drop,
+                        'gasTier': _selectedGasTier,
+                      });
+                    }
                     widget.onFareCalculated(val);
                     _resetTrip();
                   },

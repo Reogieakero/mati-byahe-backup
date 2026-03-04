@@ -49,7 +49,10 @@ class HistoryDetailsScreen extends StatelessWidget {
                     const SizedBox(height: 16),
                     RouteCard(
                       pickup: trip['pickup'] ?? "Unknown",
-                      dropOff: trip['drop_off'] ?? "Unknown",
+                      dropOff:
+                          (trip['drop_off']?.toString().isNotEmpty ?? false)
+                          ? trip['drop_off']
+                          : "---",
                     ),
                     const SizedBox(height: 32),
                     _buildSectionHeader("PAYMENT & FARE"),
@@ -83,8 +86,15 @@ class HistoryDetailsScreen extends StatelessWidget {
                     _buildSectionHeader("PARTICIPANTS"),
                     const SizedBox(height: 12),
                     DetailRow(
-                      label: "Driver ID",
-                      value: trip['driver_id'] ?? "N/A",
+                      label: "Driver Name",
+                      value:
+                          trip['driver_name']?.toString().toUpperCase() ??
+                          "N/A",
+                      isBold: true,
+                    ),
+                    DetailRow(
+                      label: "Plate Number",
+                      value: trip['driver_plate'] ?? trip['driver_id'] ?? "N/A",
                     ),
                     DetailRow(
                       label: "Passenger ID",

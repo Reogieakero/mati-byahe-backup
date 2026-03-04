@@ -101,8 +101,8 @@ class ReportDetailsScreen extends StatelessWidget {
         children: [
           ReportDetailRow(
             icon: Icons.badge_outlined,
-            label: "Driver ID",
-            value: report['driver_id'] ?? "N/A",
+            label: "Driver Plate",
+            value: report['driver_plate'] ?? report['driver_id'] ?? "N/A",
           ),
           _buildDivider(),
           ReportDetailRow(
