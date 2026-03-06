@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/constant/app_colors.dart';
 
 class ReasonSelector extends StatelessWidget {
   final String? selectedReason;
@@ -17,43 +18,47 @@ class ReasonSelector extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          "REASON FOR REPORT",
+        Text(
+          "SELECT REASON",
           style: TextStyle(
             fontSize: 10,
-            fontWeight: FontWeight.w900,
-            color: Colors.grey,
-            letterSpacing: 0.8,
+            fontWeight: FontWeight.w800,
+            color: Colors.grey.shade500,
+            letterSpacing: 0.5,
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 12),
         Wrap(
           spacing: 8,
           runSpacing: 8,
           children: reasons.map((reason) {
             final isSelected = selectedReason == reason;
-            return ChoiceChip(
-              label: Text(reason),
-              selected: isSelected,
-              onSelected: (selected) {
-                if (selected) onSelected(reason);
-              },
-              selectedColor: Colors.redAccent.withOpacity(0.2),
-              backgroundColor: Colors.white.withOpacity(0.5),
-              labelStyle: TextStyle(
-                color: isSelected ? Colors.redAccent : Colors.black87,
-                fontSize: 13,
-                fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-                side: BorderSide(
-                  color: isSelected ? Colors.redAccent : Colors.grey.shade300,
-                  width: 1,
+            return GestureDetector(
+              onTap: () => onSelected(reason),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? Colors.redAccent.withOpacity(0.05)
+                      : Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: isSelected ? Colors.redAccent : Colors.grey.shade200,
+                    width: 1,
+                  ),
+                ),
+                child: Text(
+                  reason,
+                  style: TextStyle(
+                    color: isSelected ? Colors.redAccent : AppColors.darkNavy,
+                    fontSize: 12,
+                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                  ),
                 ),
               ),
-              showCheckmark: false,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             );
           }).toList(),
         ),

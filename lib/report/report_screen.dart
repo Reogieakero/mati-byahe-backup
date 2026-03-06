@@ -39,87 +39,6 @@ class _ReportScreenState extends State<ReportScreen> {
     "Other",
   ];
 
-  void _showSuccessNotification(BuildContext context) {
-    final overlay = Overlay.of(context);
-    final overlayEntry = OverlayEntry(
-      builder: (context) => Positioned(
-        top: MediaQuery.of(context).padding.top + 10,
-        left: 15,
-        right: 15,
-        child: Material(
-          color: Colors.transparent,
-          child: TweenAnimationBuilder(
-            duration: const Duration(milliseconds: 500),
-            tween: Tween<double>(begin: -100, end: 0),
-            curve: Curves.easeOutBack,
-            builder: (context, double value, child) {
-              return Transform.translate(
-                offset: Offset(0, value),
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: AppColors.darkNavy,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.3),
-                        blurRadius: 10,
-                        offset: const Offset(0, 5),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: const BoxDecoration(
-                          color: Colors.redAccent,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.check_circle,
-                          color: Colors.white,
-                          size: 20,
-                        ),
-                      ),
-                      const SizedBox(width: 15),
-                      const Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              "Report Submitted",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14,
-                              ),
-                            ),
-                            Text(
-                              "Thank you for your feedback.",
-                              style: TextStyle(
-                                color: Colors.white70,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-      ),
-    );
-
-    overlay.insert(overlayEntry);
-    Future.delayed(const Duration(seconds: 3), () => overlayEntry.remove());
-  }
-
   Future<void> _handleMediaPick(bool isVideo) async {
     final XFile? pickedFile = isVideo
         ? await _picker.pickVideo(source: ImageSource.gallery)
@@ -155,8 +74,6 @@ class _ReportScreenState extends State<ReportScreen> {
       await SyncService().syncOnStart();
 
       if (!mounted) return;
-
-      _showSuccessNotification(context);
       Navigator.pop(context, true);
     } catch (e) {
       setState(() => _isSubmitting = false);
@@ -184,43 +101,35 @@ class _ReportScreenState extends State<ReportScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBody: true,
       backgroundColor: Colors.white,
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              AppColors.primaryYellow.withOpacity(0.2),
-              Colors.white,
-              AppColors.primaryYellow.withOpacity(0.1),
-            ],
-            stops: const [0.0, 0.5, 1.0],
-          ),
-        ),
+      appBar: _buildAppBar(context),
+      body: Padding(
+        padding: const EdgeInsets.all(15),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildAppBar(context),
+            _buildHeader(),
+            const SizedBox(height: 24),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 16,
-                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    const _SectionLabel(label: "Issue Category"),
+                    const SizedBox(height: 8),
                     ReasonSelector(
                       selectedReason: _selectedReason,
                       reasons: _reasons,
                       onSelected: (val) =>
                           setState(() => _selectedReason = val),
                     ),
-                    if (_selectedReason == "Other")
+                    if (_selectedReason == "Other") ...[
+                      const SizedBox(height: 12),
                       OtherReasonInput(controller: _otherReasonController),
+                    ],
+                    const SizedBox(height: 24),
+                    const _SectionLabel(label: "Evidence"),
+                    const SizedBox(height: 8),
                     MediaProof(
                       file: _proofFile,
                       onPickImage: () => _handleMediaPick(false),
@@ -228,16 +137,10 @@ class _ReportScreenState extends State<ReportScreen> {
                       onRemove: () => setState(() => _proofFile = null),
                     ),
                     const SizedBox(height: 24),
+                    const _SectionLabel(label: "Detailed Description"),
+                    const SizedBox(height: 8),
                     DetailsInput(controller: _detailsController),
                     const SizedBox(height: 32),
-                    _isSubmitting
-                        ? const Center(
-                            child: CircularProgressIndicator(
-                              color: Colors.redAccent,
-                            ),
-                          )
-                        : SubmitButton(onPressed: _handleSubmit),
-                    const SizedBox(height: 40),
                   ],
                 ),
               ),
@@ -245,30 +148,80 @@ class _ReportScreenState extends State<ReportScreen> {
           ],
         ),
       ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.fromLTRB(15, 0, 15, 30),
+        child: _isSubmitting
+            ? const Center(
+                child: CircularProgressIndicator(color: AppColors.darkNavy),
+              )
+            : SubmitButton(onPressed: _handleSubmit),
+      ),
     );
   }
 
-  Widget _buildAppBar(BuildContext context) {
+  Widget _buildHeader() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Report an Issue",
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.w700,
+            color: AppColors.darkNavy,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          "Tell us what went wrong with your trip.",
+          style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+        ),
+      ],
+    );
+  }
+
+  PreferredSizeWidget _buildAppBar(BuildContext context) {
     return AppBar(
-      title: const Text(
-        "REPORT TRIP",
-        style: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w900,
-          letterSpacing: 1.2,
-          color: AppColors.darkNavy,
+      backgroundColor: Colors.white,
+      elevation: 0,
+      centerTitle: true,
+      leading: IconButton(
+        icon: const Icon(Icons.close, color: AppColors.darkNavy, size: 20),
+        onPressed: () => Navigator.pop(context),
+      ),
+      title: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade100,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Text(
+          widget.trip['uuid']?.toString().substring(0, 8).toUpperCase() ??
+              "REPORT",
+          style: const TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey,
+          ),
         ),
       ),
-      centerTitle: true,
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      leading: IconButton(
-        icon: const Icon(
-          Icons.arrow_back_ios_new_rounded,
-          size: 18,
-          color: AppColors.darkNavy,
-        ),
-        onPressed: () => Navigator.pop(context),
+    );
+  }
+}
+
+class _SectionLabel extends StatelessWidget {
+  final String label;
+  const _SectionLabel({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      label.toUpperCase(),
+      style: TextStyle(
+        fontSize: 11,
+        fontWeight: FontWeight.w600,
+        letterSpacing: 0.5,
+        color: Colors.grey.shade500,
       ),
     );
   }

@@ -18,22 +18,24 @@ class HistoryDetailsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: _buildAppBar(context),
-      body: Padding(
-        padding: const EdgeInsets.all(15),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildStatusHeader(date),
-            const SizedBox(height: 24),
-            const _SectionLabel(label: "Trip Logistics"),
-            const SizedBox(height: 8),
-            TripInfoCard(trip: trip),
-            const SizedBox(height: 24),
-            const _SectionLabel(label: "Payment & Personnel"),
-            const SizedBox(height: 8),
-            PaymentInfoCard(trip: trip),
-            const Spacer(),
-          ],
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(15),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildStatusHeader(date),
+              const SizedBox(height: 24),
+              const _SectionLabel(label: "Trip Logistics"),
+              const SizedBox(height: 8),
+              TripInfoCard(trip: trip),
+              const SizedBox(height: 24),
+              const _SectionLabel(label: "Payment & Personnel"),
+              const SizedBox(height: 8),
+              PaymentInfoCard(trip: trip),
+              const SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: ReportButton(trip: trip),

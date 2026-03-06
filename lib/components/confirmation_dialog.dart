@@ -30,7 +30,7 @@ class ConfirmationDialog extends StatelessWidget {
       backgroundColor: Colors.white,
       surfaceTintColor: Colors.white,
       contentPadding: EdgeInsets.zero,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 15),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       content: Column(
         mainAxisSize: MainAxisSize.min,
