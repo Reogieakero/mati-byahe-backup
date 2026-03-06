@@ -5,40 +5,67 @@ import 'widgets/details/trip_info_card.dart';
 import 'widgets/details/payment_info_card.dart';
 import 'widgets/details/report_button.dart';
 
-class HistoryDetailsScreen extends StatelessWidget {
+class HistoryDetailsScreen extends StatefulWidget {
   final Map<String, dynamic> trip;
 
   const HistoryDetailsScreen({super.key, required this.trip});
 
   @override
+  State<HistoryDetailsScreen> createState() => _HistoryDetailsScreenState();
+}
+
+class _HistoryDetailsScreenState extends State<HistoryDetailsScreen> {
+  late Map<String, dynamic> _tripData;
+
+  @override
+  void initState() {
+    super.initState();
+    _tripData = widget.trip;
+  }
+
+  Future<void> _handleRefresh() async {
+    await Future.delayed(const Duration(seconds: 1));
+
+    setState(() {
+      _tripData = _tripData;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final DateTime date =
-        DateTime.tryParse(trip['date'] ?? '') ?? DateTime.now();
+        DateTime.tryParse(_tripData['date'] ?? '') ?? DateTime.now();
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: _buildAppBar(context),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(15),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildStatusHeader(date),
-              const SizedBox(height: 24),
-              const _SectionLabel(label: "Trip Logistics"),
-              const SizedBox(height: 8),
-              TripInfoCard(trip: trip),
-              const SizedBox(height: 24),
-              const _SectionLabel(label: "Payment & Personnel"),
-              const SizedBox(height: 8),
-              PaymentInfoCard(trip: trip),
-              const SizedBox(height: 20),
-            ],
+      body: RefreshIndicator(
+        color: AppColors.darkNavy,
+        backgroundColor: Colors.white,
+        onRefresh: _handleRefresh,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Padding(
+            padding: const EdgeInsets.all(15),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildStatusHeader(date),
+                const SizedBox(height: 24),
+                const _SectionLabel(label: "Trip Logistics"),
+                const SizedBox(height: 8),
+                TripInfoCard(trip: _tripData),
+                const SizedBox(height: 24),
+                const _SectionLabel(label: "Payment & Personnel"),
+                const SizedBox(height: 8),
+                PaymentInfoCard(trip: _tripData),
+                const SizedBox(height: 20),
+              ],
+            ),
           ),
         ),
       ),
-      bottomNavigationBar: ReportButton(trip: trip),
+      bottomNavigationBar: ReportButton(trip: _tripData),
     );
   }
 
@@ -78,9 +105,10 @@ class HistoryDetailsScreen extends StatelessWidget {
           color: Colors.grey.shade100,
           borderRadius: BorderRadius.circular(20),
         ),
-        child: const Text(
-          "TRIP-ID-8291",
-          style: TextStyle(
+        child: Text(
+          _tripData['uuid']?.toString().substring(0, 8).toUpperCase() ??
+              "TRIP-ID",
+          style: const TextStyle(
             fontSize: 10,
             fontWeight: FontWeight.bold,
             color: Colors.grey,

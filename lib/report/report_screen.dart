@@ -103,56 +103,47 @@ class _ReportScreenState extends State<ReportScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: _buildAppBar(context),
-      body: Padding(
-        padding: const EdgeInsets.all(15),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildHeader(),
-            const SizedBox(height: 24),
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const _SectionLabel(label: "Issue Category"),
-                    const SizedBox(height: 8),
-                    ReasonSelector(
-                      selectedReason: _selectedReason,
-                      reasons: _reasons,
-                      onSelected: (val) =>
-                          setState(() => _selectedReason = val),
-                    ),
-                    if (_selectedReason == "Other") ...[
-                      const SizedBox(height: 12),
-                      OtherReasonInput(controller: _otherReasonController),
-                    ],
-                    const SizedBox(height: 24),
-                    const _SectionLabel(label: "Evidence"),
-                    const SizedBox(height: 8),
-                    MediaProof(
-                      file: _proofFile,
-                      onPickImage: () => _handleMediaPick(false),
-                      onPickVideo: () => _handleMediaPick(true),
-                      onRemove: () => setState(() => _proofFile = null),
-                    ),
-                    const SizedBox(height: 24),
-                    const _SectionLabel(label: "Detailed Description"),
-                    const SizedBox(height: 8),
-                    DetailsInput(controller: _detailsController),
-                    const SizedBox(height: 32),
-                  ],
-                ),
+      body: SingleChildScrollView(
+        physics: const ClampingScrollPhysics(),
+        child: Padding(
+          padding: const EdgeInsets.all(15),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildHeader(),
+              const SizedBox(height: 20),
+              ReasonSelector(
+                selectedReason: _selectedReason,
+                reasons: _reasons,
+                onSelected: (val) => setState(() => _selectedReason = val),
               ),
-            ),
-          ],
+              if (_selectedReason == "Other") ...[
+                const SizedBox(height: 12),
+                OtherReasonInput(controller: _otherReasonController),
+              ],
+              const SizedBox(height: 20),
+              MediaProof(
+                file: _proofFile,
+                onPickImage: () => _handleMediaPick(false),
+                onPickVideo: () => _handleMediaPick(true),
+                onRemove: () => setState(() => _proofFile = null),
+              ),
+              const SizedBox(height: 20),
+              DetailsInput(controller: _detailsController),
+              const SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.fromLTRB(15, 0, 15, 30),
         child: _isSubmitting
-            ? const Center(
-                child: CircularProgressIndicator(color: AppColors.darkNavy),
+            ? const SizedBox(
+                height: 50,
+                child: Center(
+                  child: CircularProgressIndicator(color: AppColors.darkNavy),
+                ),
               )
             : SubmitButton(onPressed: _handleSubmit),
       ),
@@ -204,24 +195,6 @@ class _ReportScreenState extends State<ReportScreen> {
             color: Colors.grey,
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _SectionLabel extends StatelessWidget {
-  final String label;
-  const _SectionLabel({required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      label.toUpperCase(),
-      style: TextStyle(
-        fontSize: 11,
-        fontWeight: FontWeight.w600,
-        letterSpacing: 0.5,
-        color: Colors.grey.shade500,
       ),
     );
   }

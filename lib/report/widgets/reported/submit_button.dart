@@ -15,14 +15,16 @@ class SubmitButton extends StatelessWidget {
           foregroundColor: Colors.white,
           elevation: 0,
           padding: const EdgeInsets.symmetric(vertical: 18),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
         child: const Text(
           "SUBMIT REPORT",
           style: TextStyle(
             fontSize: 12,
-            fontWeight: FontWeight.w900,
-            letterSpacing: 1,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.8,
           ),
         ),
       ),
