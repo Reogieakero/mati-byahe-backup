@@ -60,6 +60,7 @@ class HomeController {
     required double fare,
     required String? startTime,
     required String driverName,
+    required String driverPlate,
     required String? driverId,
     required Function() onCleared,
   }) async {
@@ -82,6 +83,7 @@ class HomeController {
       fare: fare,
       gasTier: gasTier,
       passengerId: currentUser?.id,
+      driverPlate: driverPlate,
       driverId: driverId,
       driverName: driverName,
       startTime: startTime,

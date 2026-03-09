@@ -183,6 +183,7 @@ class _HomeScreenState extends State<HomeScreen>
               fare: fareValue,
               startTime: dataToClear['start_time'],
               driverName: "None Assigned",
+              driverPlate: dataToClear['driver_plate'] ?? "---",
               driverId: null,
               onCleared: () {
                 // Background sync happens here
@@ -193,6 +194,7 @@ class _HomeScreenState extends State<HomeScreen>
       },
       onCancel: () {
         _controller.confirmChangeRoute(context, () async {
+          final dataToClear = _activeTripData;
           if (mounted) {
             setState(() {
               _activeTripData = null;
@@ -207,6 +209,7 @@ class _HomeScreenState extends State<HomeScreen>
             fare: 0.0,
             startTime: _activeTripData?['start_time'],
             driverName: "Cancelled",
+            driverPlate: dataToClear?['driver_plate'] ?? "---",
             driverId: null,
             onCleared: () {},
           );
