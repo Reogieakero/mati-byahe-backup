@@ -70,12 +70,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void _handleLogout() {
     showDialog(
       context: context,
-      builder: (context) => ConfirmationDialog(
+      builder: (dialogContext) => ConfirmationDialog(
         title: "Logout",
         content: "Are you sure you want to log out?",
         confirmText: "Logout",
         onConfirm: () async {
+          Navigator.pop(dialogContext);
+
           await _authService.signOut();
+
           if (mounted) {
             Navigator.pushAndRemoveUntil(
               context,
@@ -178,41 +181,36 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
                 const SizedBox(height: 35),
-                Center(
-                  child: Wrap(
-                    spacing: 30,
-                    runSpacing: 20,
-                    alignment: WrapAlignment.center,
-                    children: [
-                      _buildActionItem(
-                        icon: Icons.auto_stories_rounded,
-                        label: "App Guide",
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                GuideScreen(role: widget.role),
-                          ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _buildActionItem(
+                      icon: Icons.auto_stories_rounded,
+                      label: "App Guide",
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => GuideScreen(role: widget.role),
                         ),
                       ),
-                      _buildActionItem(
-                        icon: Icons.gavel_rounded,
-                        label: "Legal",
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const LegalScreen(),
-                          ),
+                    ),
+                    _buildActionItem(
+                      icon: Icons.gavel_rounded,
+                      label: "Legal",
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const LegalScreen(),
                         ),
                       ),
-                      _buildActionItem(
-                        icon: Icons.logout_rounded,
-                        label: "Logout",
-                        color: Colors.redAccent,
-                        onTap: _handleLogout,
-                      ),
-                    ],
-                  ),
+                    ),
+                    _buildActionItem(
+                      icon: Icons.logout_rounded,
+                      label: "Logout",
+                      color: Colors.redAccent,
+                      onTap: _handleLogout,
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 25),
               ],
@@ -231,29 +229,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        width: 70,
-        padding: const EdgeInsets.symmetric(vertical: 8),
+      borderRadius: BorderRadius.circular(15),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.08),
+                color: color.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, color: color, size: 24),
+              child: Icon(icon, color: color, size: 26),
             ),
             const SizedBox(height: 8),
             Text(
               label,
-              textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 11,
+                fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: AppColors.darkNavy.withOpacity(0.8),
+                color: AppColors.darkNavy.withOpacity(0.7),
               ),
             ),
           ],
