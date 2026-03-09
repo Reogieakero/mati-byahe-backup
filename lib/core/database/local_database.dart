@@ -23,7 +23,7 @@ class LocalDatabase {
 
     return await openDatabase(
       pathName,
-      version: 29, // INCREMENTED TO 29
+      version: 30,
       onCreate: (db, version) async => await _createTables(db),
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 26) {
@@ -37,22 +37,24 @@ class LocalDatabase {
             await db.execute('ALTER TABLE users ADD COLUMN vehicle_type TEXT');
           } catch (e) {}
         }
-
         if (oldVersion < 27) {
           try {
             await db.execute('ALTER TABLE trips ADD COLUMN driver_plate TEXT');
           } catch (e) {}
         }
-
-        // Migration for version 28/29 to ensure driver_plate exists
         if (oldVersion < 29) {
           try {
             await db.execute(
               'ALTER TABLE active_fare ADD COLUMN driver_plate TEXT',
             );
-          } catch (e) {
-            debugPrint("Migration 29 Error: $e");
-          }
+          } catch (e) {}
+        }
+        if (oldVersion < 30) {
+          try {
+            await db.execute(
+              'ALTER TABLE reports ADD COLUMN is_unreported INTEGER DEFAULT 0',
+            );
+          } catch (e) {}
         }
       },
     );
@@ -102,6 +104,7 @@ class LocalDatabase {
         drop_off TEXT,
         fare REAL,
         gas_tier TEXT,
+        date TEXT,
         start_time TEXT,
         end_time TEXT,
         is_synced INTEGER DEFAULT 0
@@ -124,7 +127,8 @@ class LocalDatabase {
         status TEXT DEFAULT 'pending',
         reported_at TEXT,
         is_synced INTEGER DEFAULT 0,
-        is_deleted INTEGER DEFAULT 0
+        is_deleted INTEGER DEFAULT 0,
+        is_unreported INTEGER DEFAULT 0
       )
     ''');
   }

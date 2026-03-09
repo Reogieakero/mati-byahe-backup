@@ -17,7 +17,7 @@ class SyncService {
 
       final db = await _localDb.database;
 
-      await pullUserData(); // Fetch data from Cloud to Local first
+      await pullUserData();
       await _syncProfileChanges(db);
       await _syncTrips(db);
       await _syncReports(db);
@@ -169,7 +169,9 @@ class SyncService {
           where: 'id = ?',
           whereArgs: [data['id']],
         );
-      } catch (e) {}
+      } catch (e) {
+        debugPrint("SUPABASE REPORT SYNC ERROR: $e");
+      }
     }
   }
 
