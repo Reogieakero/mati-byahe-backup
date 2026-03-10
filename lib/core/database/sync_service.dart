@@ -131,9 +131,9 @@ class SyncService {
           'drop_off': data['drop_off'] ?? '',
           'calculated_fare': data['fare'] ?? 0.0,
           'gas_tier': data['gas_tier'],
-          'start_datetime': data['start_time'],
-          'end_datetime': data['end_time'],
-          'status': data['end_time'] != null ? 'completed' : 'active',
+          'start_time': data['start_datetime'],
+          'end_time': data['end_datetime'],
+          'status': data['end_datetime'] != null ? 'completed' : 'active',
         }, onConflict: 'uuid');
 
         await db.update(

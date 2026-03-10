@@ -22,7 +22,7 @@ class HistoryTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final DateTime date =
-        DateTime.tryParse(trip['date'] ?? '') ?? DateTime.now();
+        DateTime.tryParse(trip['start_time'] ?? '') ?? DateTime.now();
     final double fare = (trip['fare'] as num?)?.toDouble() ?? 0.0;
     final String pickup = trip['pickup'] ?? "Pickup";
     final String dropOff = trip['drop_off'] ?? "Destination";

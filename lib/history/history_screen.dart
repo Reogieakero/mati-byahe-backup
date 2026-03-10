@@ -43,8 +43,23 @@ class _HistoryScreenState extends State<HistoryScreen> {
       final trips = await LocalDatabase().getTripsByPassengerId(userId);
       if (mounted) {
         setState(() {
-          _allTrips = trips;
-          _filteredTrips = trips;
+          var filtered = trips.where((trip) {
+            final String gasTier = (trip['gas_tier'] ?? "")
+                .toString()
+                .toUpperCase();
+            return gasTier != "N/A" && gasTier.isNotEmpty;
+          }).toList();
+
+          filtered.sort((a, b) {
+            DateTime dateA =
+                DateTime.tryParse(a['start_time'] ?? '') ?? DateTime(0);
+            DateTime dateB =
+                DateTime.tryParse(b['start_time'] ?? '') ?? DateTime(0);
+            return dateB.compareTo(dateA);
+          });
+
+          _allTrips = filtered;
+          _filteredTrips = filtered;
         });
       }
     }
