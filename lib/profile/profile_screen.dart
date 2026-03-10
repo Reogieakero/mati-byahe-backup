@@ -148,7 +148,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                               ),
                             );
-                            if (result == true) _fetchUserData();
+                            if (result == true) await _fetchUserData();
                           },
                         ),
                         if (widget.role.toLowerCase() == 'driver') ...[

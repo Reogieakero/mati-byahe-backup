@@ -17,6 +17,8 @@ class ProfileHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool hasImage = avatarUrl != null && avatarUrl!.isNotEmpty;
+
     return Column(
       children: [
         Container(
@@ -46,34 +48,19 @@ class ProfileHeader extends StatelessWidget {
             ),
             child: CircleAvatar(
               radius: 45,
-              backgroundColor: AppColors.primaryBlue,
-              child: ClipOval(
-                child: (avatarUrl != null && avatarUrl!.isNotEmpty)
-                    ? Image.network(
-                        '$avatarUrl?t=${DateTime.now().millisecondsSinceEpoch}',
-                        width: 90,
-                        height: 90,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) =>
-                            const Icon(
-                              Icons.person_rounded,
-                              size: 50,
-                              color: Colors.white,
-                            ),
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return const CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
-                          );
-                        },
-                      )
-                    : const Icon(
-                        Icons.person_rounded,
-                        size: 50,
-                        color: Colors.white,
-                      ),
-              ),
+              backgroundColor: AppColors.primaryBlue.withOpacity(0.1),
+              backgroundImage: hasImage
+                  ? NetworkImage(
+                      '$avatarUrl?t=${DateTime.now().millisecondsSinceEpoch}',
+                    )
+                  : null,
+              child: !hasImage
+                  ? const Icon(
+                      Icons.person_rounded,
+                      size: 50,
+                      color: AppColors.primaryBlue,
+                    )
+                  : null,
             ),
           ),
         ),
@@ -94,6 +81,27 @@ class ProfileHeader extends StatelessWidget {
             fontSize: 13,
             color: AppColors.textGrey.withOpacity(0.8),
             fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+          decoration: BoxDecoration(
+            color: role.toLowerCase() == 'driver'
+                ? Colors.orange.withOpacity(0.1)
+                : AppColors.primaryBlue.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(100),
+          ),
+          child: Text(
+            role.toUpperCase(),
+            style: TextStyle(
+              color: role.toLowerCase() == 'driver'
+                  ? Colors.orange.shade800
+                  : AppColors.primaryBlue,
+              fontWeight: FontWeight.w900,
+              fontSize: 10,
+              letterSpacing: 1,
+            ),
           ),
         ),
       ],
