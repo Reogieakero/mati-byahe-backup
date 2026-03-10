@@ -168,7 +168,7 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
         style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
         decoration: InputDecoration(
           hintText: "Search location...",
-          hintStyle: TextStyle(color: Colors.black.withOpacity(0.5)),
+          hintStyle: TextStyle(color: Colors.grey.withOpacity(0.5)),
           prefixIcon: const Padding(
             padding: EdgeInsets.only(left: 15, right: 10),
             child: Icon(Icons.search, size: 20, color: Colors.black54),
