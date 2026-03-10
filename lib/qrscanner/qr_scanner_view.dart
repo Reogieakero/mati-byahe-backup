@@ -124,9 +124,9 @@ class _QrScannerViewState extends State<QrScannerView>
                         size: 64,
                       ),
                       const SizedBox(height: 16),
-                      Text(
+                      const Text(
                         "Camera Error",
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                         ),
@@ -152,7 +152,7 @@ class _QrScannerViewState extends State<QrScannerView>
       children: [
         ColorFiltered(
           colorFilter: ColorFilter.mode(
-            Colors.black.withOpacity(0.6),
+            Colors.black.withValues(alpha: 0.6),
             BlendMode.srcOut,
           ),
           child: Stack(
@@ -183,7 +183,7 @@ class _QrScannerViewState extends State<QrScannerView>
             width: 250,
             height: 250,
             decoration: BoxDecoration(
-              border: Border.all(color: AppColors.primaryYellow, width: 4),
+              border: Border.all(color: AppColors.primaryBlue, width: 4),
               borderRadius: BorderRadius.circular(20),
             ),
           ),

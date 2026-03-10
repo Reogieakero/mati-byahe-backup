@@ -10,29 +10,22 @@ class DriverDetailsView extends StatelessWidget {
   Widget build(BuildContext context) {
     final String name = driverData['name']?.toString() ?? 'Unknown Driver';
     final String plate = driverData['plate']?.toString() ?? 'No Plate Info';
-    final String vehicle = driverData['vehicle_type']?.toString() ?? 'Vehicle';
+    final String vehicle = driverData['type']?.toString() ?? 'Vehicle';
     final String color = driverData['color']?.toString() ?? 'Not Specified';
-    final String photoUrl = driverData['photo_url']?.toString() ?? '';
+    final String photoUrl = driverData['avatar']?.toString() ?? '';
 
-    final ignoredKeys = [
-      'name',
-      'plate',
-      'vehicle_type',
-      'color',
-      'photo_url',
-      'id',
-    ];
+    final ignoredKeys = ['name', 'plate', 'type', 'color', 'avatar', 'id'];
+
     final otherData = driverData.entries
         .where((entry) => !ignoredKeys.contains(entry.key.toLowerCase()))
         .toList();
-
-    const double gutter = 15.0;
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        scrolledUnderElevation: 0,
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(
@@ -54,14 +47,13 @@ class DriverDetailsView extends StatelessWidget {
       ),
       body: Column(
         children: [
-          // Header Section: Visual Identity
           Container(
             padding: const EdgeInsets.symmetric(vertical: 30),
             width: double.infinity,
             decoration: BoxDecoration(
-              color: AppColors.darkNavy.withOpacity(0.02),
+              color: AppColors.darkNavy.withValues(alpha: 0.02),
               border: Border(
-                bottom: BorderSide(color: Colors.grey.withOpacity(0.1)),
+                bottom: BorderSide(color: Colors.grey.withValues(alpha: 0.1)),
               ),
             ),
             child: Column(
@@ -71,13 +63,13 @@ class DriverDetailsView extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: AppColors.primaryYellow,
+                      color: AppColors.primaryBlue.withValues(alpha: 0.2),
                       width: 2,
                     ),
                   ),
                   child: CircleAvatar(
                     radius: 45,
-                    backgroundColor: AppColors.darkNavy.withOpacity(0.1),
+                    backgroundColor: AppColors.darkNavy.withValues(alpha: 0.1),
                     backgroundImage: photoUrl.isNotEmpty
                         ? NetworkImage(photoUrl)
                         : null,
@@ -107,26 +99,24 @@ class DriverDetailsView extends StatelessWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.primaryYellow,
+                    color: Colors.orange.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(4),
                   ),
-                  child: const Text(
+                  child: Text(
                     "VERIFIED OPERATOR",
                     style: TextStyle(
                       fontSize: 9,
                       fontWeight: FontWeight.w900,
-                      color: Colors.black,
+                      color: Colors.orange.shade900,
                     ),
                   ),
                 ),
               ],
             ),
           ),
-
-          // Detail Section: Minimalist Rows
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: gutter),
+              padding: const EdgeInsets.symmetric(horizontal: 15),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -140,8 +130,6 @@ class DriverDetailsView extends StatelessWidget {
                   ),
                   _buildDivider(),
                   _buildModernRow("Color", color, Icons.palette_outlined),
-
-                  // Dynamic fields from JSON
                   if (otherData.isNotEmpty) ...[
                     const SizedBox(height: 30),
                     const Text(
@@ -156,8 +144,7 @@ class DriverDetailsView extends StatelessWidget {
                     const SizedBox(height: 10),
                     Expanded(
                       child: ListView.separated(
-                        physics:
-                            const NeverScrollableScrollPhysics(), // Keeps screen static
+                        physics: const BouncingScrollPhysics(),
                         itemCount: otherData.length,
                         separatorBuilder: (context, index) => _buildDivider(),
                         itemBuilder: (context, index) {
@@ -175,8 +162,6 @@ class DriverDetailsView extends StatelessWidget {
               ),
             ),
           ),
-
-          // Bottom subtle branding
         ],
       ),
     );
@@ -187,7 +172,11 @@ class DriverDetailsView extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: Row(
         children: [
-          Icon(icon, size: 20, color: AppColors.darkNavy.withOpacity(0.4)),
+          Icon(
+            icon,
+            size: 20,
+            color: AppColors.darkNavy.withValues(alpha: 0.4),
+          ),
           const SizedBox(width: 15),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -219,7 +208,7 @@ class DriverDetailsView extends StatelessWidget {
 
   Widget _buildDivider() {
     return Divider(
-      color: Colors.grey.withOpacity(0.1),
+      color: Colors.grey.withValues(alpha: 0.1),
       thickness: 1,
       height: 1,
     );
