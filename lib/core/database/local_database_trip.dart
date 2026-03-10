@@ -1,11 +1,6 @@
 part of 'local_database.dart';
 
 extension TripDatabase on LocalDatabase {
-  /// Saves a trip locally.
-  ///
-  /// If [uuid] is provided we will use that value; otherwise a new one is
-  /// generated. The generated or provided uuid is returned so callers can
-  /// later update the same record (for example when completing the trip).
   Future<String> saveTrip({
     String? uuid,
     required String email,

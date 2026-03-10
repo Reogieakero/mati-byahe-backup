@@ -18,12 +18,50 @@ class SyncService {
       final db = await _localDb.database;
 
       await pullUserData();
+      await _pullTrips(db);
       await _syncProfileChanges(db);
       await _syncTrips(db);
       await _syncReports(db);
       await _syncDeletedReports(db);
     } catch (e) {
       debugPrint("Sync error: $e");
+    }
+  }
+
+  Future<void> _pullTrips(Database db) async {
+    final user = _supabase.auth.currentUser;
+    if (user == null) return;
+
+    try {
+      final remoteTrips = await _supabase
+          .from('trips')
+          .select()
+          .or('passenger_id.eq.${user.id},driver_id.eq.${user.id}')
+          .eq('status', 'completed');
+
+      if (remoteTrips != null) {
+        final batch = db.batch();
+        for (var trip in remoteTrips) {
+          batch.insert('trips', {
+            'uuid': trip['uuid'] ?? trip['id'],
+            'passenger_id': trip['passenger_id'],
+            'driver_id': trip['driver_id'],
+            'driver_name': trip['driver_name'],
+            'driver_plate': trip['driver_plate'],
+            'pickup': trip['pickup'],
+            'drop_off': trip['drop_off'],
+            'fare': (trip['calculated_fare'] as num?)?.toDouble() ?? 0.0,
+            'gas_tier': trip['gas_tier'],
+            'date': trip['created_at'],
+            'start_time': trip['start_time'],
+            'end_time': trip['end_time'],
+            'is_synced': 1,
+          }, conflictAlgorithm: ConflictAlgorithm.replace);
+        }
+        await batch.commit(noResult: true);
+      }
+    } catch (e) {
+      debugPrint("Pull trips error: $e");
     }
   }
 
@@ -38,7 +76,6 @@ class SyncService {
           .select()
           .eq('id', user.id)
           .maybeSingle();
-
       if (profile != null) {
         await db.insert('users', {
           'id': profile['id'],

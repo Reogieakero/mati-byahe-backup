@@ -26,6 +26,7 @@ dependencies:
   chewie: ^1.8.12
   mobile_scanner: ^5.1.0
   qr_flutter: ^4.1.0
+  fl_chart: ^0.70.2
 
 dev_dependencies:
   flutter_test:
