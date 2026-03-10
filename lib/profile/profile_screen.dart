@@ -30,6 +30,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   String? _userName;
   String? _userPhone;
+  String? _avatarUrl;
   bool _isLoading = true;
 
   @override
@@ -43,27 +44,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (user == null) return;
 
     try {
+      final localData = await _localDb.getUserById(user.id);
+      if (localData != null) {
+        setState(() {
+          _userName = localData['full_name'];
+          _userPhone = localData['phone_number'];
+          _avatarUrl = localData['avatar_url'];
+          _isLoading = false;
+        });
+      }
+
       final data = await _supabase
           .from('profiles')
           .select()
           .eq('id', user.id)
           .maybeSingle();
-      if (mounted) {
+
+      if (mounted && data != null) {
         setState(() {
-          _userName = data?['full_name'];
-          _userPhone = data?['phone_number'];
+          _userName = data['full_name'];
+          _userPhone = data['phone_number'];
+          _avatarUrl = data['avatar_url'];
           _isLoading = false;
         });
       }
     } catch (e) {
-      final localData = await _localDb.getUserById(user.id);
-      if (mounted) {
-        setState(() {
-          _userName = localData?['full_name'];
-          _userPhone = localData?['phone_number'];
-          _isLoading = false;
-        });
-      }
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -76,7 +82,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         confirmText: "Logout",
         onConfirm: () async {
           await _authService.signOut();
-
           if (mounted) {
             Navigator.pushAndRemoveUntil(
               context,
@@ -107,111 +112,117 @@ class _ProfileScreenState extends State<ProfileScreen> {
       backgroundColor: Colors.white,
       body: SafeArea(
         top: false,
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ProfileHeader(
-                  email: widget.email,
-                  name: _userName ?? "Set your name",
-                  role: widget.role,
-                ),
-                const SizedBox(height: 25),
-                _buildSectionLabel("ACCOUNT SETTINGS"),
-                _buildShadcnCard(
-                  child: Column(
-                    children: [
-                      ProfileMenuItem(
-                        icon: Icons.person_outline_rounded,
-                        title: 'Edit Profile',
-                        onTap: () async {
-                          final result = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => EditProfileScreen(
-                                initialName: _userName ?? "",
-                                initialEmail: widget.email,
-                                initialPhone: _userPhone ?? "",
-                                role: widget.role,
-                              ),
-                            ),
-                          );
-                          if (result == true) _fetchUserData();
-                        },
-                      ),
-                      if (widget.role.toLowerCase() == 'driver') ...[
-                        _buildDivider(),
+        child: RefreshIndicator(
+          onRefresh: _fetchUserData,
+          color: AppColors.primaryBlue,
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ProfileHeader(
+                    email: widget.email,
+                    name: _userName ?? "Set your name",
+                    role: widget.role,
+                    avatarUrl: _avatarUrl,
+                  ),
+                  const SizedBox(height: 25),
+                  _buildSectionLabel("ACCOUNT SETTINGS"),
+                  _buildShadcnCard(
+                    child: Column(
+                      children: [
                         ProfileMenuItem(
-                          icon: Icons.qr_code_2_rounded,
-                          title: 'My QR Code ID',
+                          icon: Icons.person_outline_rounded,
+                          title: 'Edit Profile',
                           onTap: () async {
-                            final userId = _supabase.auth.currentUser?.id;
-                            if (userId != null) {
-                              final data = await _localDb.getUserById(userId);
-                              if (data != null && mounted) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        QRCodeScreen(driverData: data),
-                                  ),
-                                );
-                              }
-                            }
+                            final result = await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => EditProfileScreen(
+                                  initialName: _userName ?? "",
+                                  initialEmail: widget.email,
+                                  initialPhone: _userPhone ?? "",
+                                  role: widget.role,
+                                ),
+                              ),
+                            );
+                            if (result == true) _fetchUserData();
                           },
                         ),
+                        if (widget.role.toLowerCase() == 'driver') ...[
+                          _buildDivider(),
+                          ProfileMenuItem(
+                            icon: Icons.qr_code_2_rounded,
+                            title: 'My QR Code ID',
+                            onTap: () async {
+                              final userId = _supabase.auth.currentUser?.id;
+                              if (userId != null) {
+                                final data = await _localDb.getUserById(userId);
+                                if (data != null && mounted) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          QRCodeScreen(driverData: data),
+                                    ),
+                                  );
+                                }
+                              }
+                            },
+                          ),
+                        ],
+                        _buildDivider(),
+                        ProfileMenuItem(
+                          icon: Icons.lock_outline_rounded,
+                          title: 'Security PIN',
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const SetPinScreen(),
+                            ),
+                          ),
+                        ),
                       ],
-                      _buildDivider(),
-                      ProfileMenuItem(
-                        icon: Icons.lock_outline_rounded,
-                        title: 'Security PIN',
+                    ),
+                  ),
+                  const SizedBox(height: 35),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildActionItem(
+                        icon: Icons.auto_stories_rounded,
+                        label: "App Guide",
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const SetPinScreen(),
+                            builder: (context) =>
+                                GuideScreen(role: widget.role),
                           ),
                         ),
                       ),
+                      _buildActionItem(
+                        icon: Icons.gavel_rounded,
+                        label: "Legal",
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const LegalScreen(),
+                          ),
+                        ),
+                      ),
+                      _buildActionItem(
+                        icon: Icons.logout_rounded,
+                        label: "Logout",
+                        color: Colors.redAccent,
+                        onTap: _handleLogout,
+                      ),
                     ],
                   ),
-                ),
-                const SizedBox(height: 35),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildActionItem(
-                      icon: Icons.auto_stories_rounded,
-                      label: "App Guide",
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => GuideScreen(role: widget.role),
-                        ),
-                      ),
-                    ),
-                    _buildActionItem(
-                      icon: Icons.gavel_rounded,
-                      label: "Legal",
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const LegalScreen(),
-                        ),
-                      ),
-                    ),
-                    _buildActionItem(
-                      icon: Icons.logout_rounded,
-                      label: "Logout",
-                      color: Colors.redAccent,
-                      onTap: _handleLogout,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 25),
-              ],
+                  const SizedBox(height: 25),
+                ],
+              ),
             ),
           ),
         ),

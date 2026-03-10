@@ -23,7 +23,7 @@ class LocalDatabase {
 
     return await openDatabase(
       pathName,
-      version: 30,
+      version: 31,
       onCreate: (db, version) async => await _createTables(db),
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 26) {
@@ -56,6 +56,11 @@ class LocalDatabase {
             );
           } catch (e) {}
         }
+        if (oldVersion < 31) {
+          try {
+            await db.execute('ALTER TABLE users ADD COLUMN avatar_url TEXT');
+          } catch (e) {}
+        }
       },
     );
   }
@@ -72,6 +77,7 @@ class LocalDatabase {
         vehicle_color TEXT,
         address TEXT,
         license_number TEXT,
+        avatar_url TEXT,
         vehicle_type TEXT,
         login_pin TEXT,
         last_profile_update TEXT,

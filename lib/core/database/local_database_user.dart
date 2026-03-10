@@ -10,6 +10,7 @@ extension UserDatabase on LocalDatabase {
     String? address,
     String? license,
     String? vehicleType,
+    String? avatarUrl,
   }) async {
     final db = await database;
     await db.update(
@@ -22,6 +23,7 @@ extension UserDatabase on LocalDatabase {
         'address': address,
         'license_number': license,
         'vehicle_type': vehicleType,
+        'avatar_url': avatarUrl,
         'last_profile_update': DateTime.now().toIso8601String(),
         'is_synced': 0,
       },

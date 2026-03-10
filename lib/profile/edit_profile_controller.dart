@@ -1,5 +1,7 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:image_picker/image_picker.dart';
 import '../core/database/local_database.dart';
 
 class EditProfileController {
@@ -22,6 +24,9 @@ class EditProfileController {
   String selectedSuffix = '';
   bool isLoading = true;
 
+  File? selectedImage;
+  String? currentAvatarUrl;
+
   Future<void> init({
     required String name,
     required String email,
@@ -39,6 +44,7 @@ class EditProfileController {
             .single();
 
         _parseName(userData['full_name'] ?? name);
+        currentAvatarUrl = userData['avatar_url'];
         emailController = TextEditingController(
           text: userData['email'] ?? email,
         );
@@ -106,6 +112,38 @@ class EditProfileController {
     selectedSuffix = foundSuffix;
   }
 
+  Future<void> pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 70,
+    );
+    if (pickedFile != null) {
+      selectedImage = File(pickedFile.path);
+    }
+  }
+
+  Future<String?> _uploadAvatar(String userId) async {
+    if (selectedImage == null) return currentAvatarUrl;
+
+    try {
+      final fileName =
+          '$userId/avatar_${DateTime.now().millisecondsSinceEpoch}.jpg';
+
+      await _supabase.storage
+          .from('profiles')
+          .upload(
+            fileName,
+            selectedImage!,
+            fileOptions: const FileOptions(upsert: true),
+          );
+
+      return _supabase.storage.from('profiles').getPublicUrl(fileName);
+    } catch (e) {
+      return currentAvatarUrl;
+    }
+  }
+
   Future<bool> saveProfile() async {
     final String fullNameString = [
       firstNameController.text.trim(),
@@ -118,9 +156,9 @@ class EditProfileController {
     if (userId == null) return false;
 
     try {
+      final uploadedUrl = await _uploadAvatar(userId);
       final nowIso = DateTime.now().toUtc().toIso8601String();
 
-      // Update Supabase
       await _supabase
           .from('profiles')
           .update({
@@ -131,11 +169,11 @@ class EditProfileController {
             'address': addressController.text.trim(),
             'license_number': licenseNumberController.text.trim(),
             'vehicle_type': vehicleTypeController.text.trim(),
+            'avatar_url': uploadedUrl,
             'updated_at': nowIso,
           })
           .eq('id', userId);
 
-      // Update Local
       await _localDb.updateUserProfile(
         id: userId,
         name: fullNameString,
@@ -145,6 +183,7 @@ class EditProfileController {
         address: addressController.text.trim(),
         license: licenseNumberController.text.trim(),
         vehicleType: vehicleTypeController.text.trim(),
+        avatarUrl: uploadedUrl,
       );
       return true;
     } catch (e) {
@@ -152,9 +191,7 @@ class EditProfileController {
     }
   }
 
-  String? getUserId() {
-    return _supabase.auth.currentUser?.id;
-  }
+  String? getUserId() => _supabase.auth.currentUser?.id;
 
   void dispose() {
     firstNameController.dispose();

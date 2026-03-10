@@ -44,42 +44,25 @@ class SyncService {
           'id': profile['id'],
           'full_name': profile['full_name'],
           'phone_number': profile['phone_number'],
+          'avatar_url': profile['avatar_url'],
           'role': profile['role'],
           'email': user.email,
+          'plate_number': profile['plate_number'],
+          'vehicle_color': profile['vehicle_color'],
+          'address': profile['address'],
+          'license_number': profile['license_number'],
+          'vehicle_type': profile['vehicle_type'],
+          'login_pin': profile['login_pin'],
           'is_verified': 1,
           'is_synced': 1,
         }, conflictAlgorithm: ConflictAlgorithm.replace);
-      }
-
-      final trips = await _supabase
-          .from('trips')
-          .select()
-          .or('passenger_id.eq.${user.id},driver_id.eq.${user.id}');
-
-      if (trips != null) {
-        for (var trip in trips) {
-          await db.insert('trips', {
-            'uuid': trip['uuid'],
-            'passenger_id': trip['passenger_id'],
-            'driver_id': trip['driver_id'],
-            'driver_name': trip['driver_name'],
-            'driver_plate': trip['driver_plate'],
-            'pickup': trip['pickup'],
-            'drop_off': trip['drop_off'],
-            'fare': trip['calculated_fare'],
-            'gas_tier': trip['gas_tier'],
-            'start_time': trip['start_datetime'],
-            'end_time': trip['end_datetime'],
-            'is_synced': 1,
-          }, conflictAlgorithm: ConflictAlgorithm.replace);
-        }
       }
     } catch (e) {
       debugPrint("Pull error: $e");
     }
   }
 
-  Future<void> _syncProfileChanges(db) async {
+  Future<void> _syncProfileChanges(Database db) async {
     final currentUser = _supabase.auth.currentUser;
     if (currentUser == null) return;
 
@@ -91,16 +74,21 @@ class SyncService {
 
     if (unsynced.isEmpty) return;
     final userData = unsynced.first;
-    if (userData['role'] == null || userData['role'] == 'Unknown') return;
 
     try {
       await _supabase.from('profiles').upsert({
         'id': userData['id'],
         'full_name': userData['full_name'],
         'phone_number': userData['phone_number'],
+        'avatar_url': userData['avatar_url'],
+        'plate_number': userData['plate_number'],
+        'vehicle_color': userData['vehicle_color'],
+        'address': userData['address'],
+        'license_number': userData['license_number'],
+        'vehicle_type': userData['vehicle_type'],
         'role': userData['role'],
         'login_pin': userData['login_pin'],
-        'updated_at': DateTime.now().toIso8601String(),
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
       });
 
       await db.update(
@@ -109,10 +97,12 @@ class SyncService {
         where: 'id = ?',
         whereArgs: [userData['id']],
       );
-    } catch (e) {}
+    } catch (e) {
+      debugPrint("Profile push error: $e");
+    }
   }
 
-  Future<void> _syncTrips(db) async {
+  Future<void> _syncTrips(Database db) async {
     final List<Map<String, dynamic>> unsynced = await db.query(
       'trips',
       where: 'is_synced = ?',
@@ -131,9 +121,9 @@ class SyncService {
           'drop_off': data['drop_off'] ?? '',
           'calculated_fare': data['fare'] ?? 0.0,
           'gas_tier': data['gas_tier'],
-          'start_time': data['start_datetime'],
-          'end_time': data['end_datetime'],
-          'status': data['end_datetime'] != null ? 'completed' : 'active',
+          'start_time': data['start_time'],
+          'end_time': data['end_time'],
+          'status': data['end_time'] != null ? 'completed' : 'active',
         }, onConflict: 'uuid');
 
         await db.update(
@@ -143,12 +133,12 @@ class SyncService {
           whereArgs: [data['uuid']],
         );
       } catch (e) {
-        debugPrint("Sync failed for trip ${data['uuid']}: $e");
+        debugPrint("Trip sync error: $e");
       }
     }
   }
 
-  Future<void> _syncReports(db) async {
+  Future<void> _syncReports(Database db) async {
     final List<Map<String, dynamic>> unsynced = await db.query(
       'reports',
       where: 'is_synced = ? AND is_deleted = ?',
@@ -158,11 +148,15 @@ class SyncService {
       try {
         await _supabase.from('reports').upsert({
           'trip_uuid': data['trip_uuid'],
+          'passenger_id': data['passenger_id'],
+          'driver_id': data['driver_id'],
           'issue_type': data['issue_type'],
           'description': data['description'],
+          'evidence_url': data['evidence_url'],
           'status': data['status'],
           'reported_at': data['reported_at'],
         }, onConflict: 'trip_uuid');
+
         await db.update(
           'reports',
           {'is_synced': 1},
@@ -170,12 +164,12 @@ class SyncService {
           whereArgs: [data['id']],
         );
       } catch (e) {
-        debugPrint("SUPABASE REPORT SYNC ERROR: $e");
+        debugPrint("Report sync error: $e");
       }
     }
   }
 
-  Future<void> _syncDeletedReports(db) async {
+  Future<void> _syncDeletedReports(Database db) async {
     final List<Map<String, dynamic>> deleted = await db.query(
       'reports',
       where: 'is_deleted = ?',
@@ -188,7 +182,9 @@ class SyncService {
             .delete()
             .eq('trip_uuid', data['trip_uuid']);
         await db.delete('reports', where: 'id = ?', whereArgs: [data['id']]);
-      } catch (e) {}
+      } catch (e) {
+        debugPrint("Delete report sync error: $e");
+      }
     }
   }
 }

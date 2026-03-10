@@ -26,175 +26,202 @@ class DriverDetailsView extends StatelessWidget {
         .where((entry) => !ignoredKeys.contains(entry.key.toLowerCase()))
         .toList();
 
+    const double gutter = 15.0;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FB),
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text(
-          "DRIVER PROFILE",
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w900,
-            color: AppColors.darkNavy,
-            letterSpacing: 1.2,
-          ),
-        ),
-        centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
+        centerTitle: true,
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_back_ios_new,
             color: AppColors.darkNavy,
-            size: 20,
+            size: 18,
           ),
           onPressed: () => Navigator.pop(context),
         ),
+        title: const Text(
+          "IDENTIFICATION",
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w800,
+            color: AppColors.darkNavy,
+            letterSpacing: 2.0,
+          ),
+        ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+      body: Column(
+        children: [
+          // Header Section: Visual Identity
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 30),
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: AppColors.darkNavy.withOpacity(0.02),
+              border: Border(
+                bottom: BorderSide(color: Colors.grey.withOpacity(0.1)),
               ),
-              child: Column(
-                children: [
-                  CircleAvatar(
-                    radius: 50,
+            ),
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: AppColors.primaryYellow,
+                      width: 2,
+                    ),
+                  ),
+                  child: CircleAvatar(
+                    radius: 45,
                     backgroundColor: AppColors.darkNavy.withOpacity(0.1),
                     backgroundImage: photoUrl.isNotEmpty
                         ? NetworkImage(photoUrl)
                         : null,
                     child: photoUrl.isEmpty
                         ? const Icon(
-                            Icons.person,
-                            size: 50,
+                            Icons.person_outline,
+                            size: 40,
                             color: AppColors.darkNavy,
                           )
                         : null,
                   ),
-                  const SizedBox(height: 16),
-                  Text(
-                    name.toUpperCase(),
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.darkNavy,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-            _buildInfoTile(
-              label: "PLATE NUMBER",
-              value: plate,
-              icon: Icons.tag,
-            ),
-            const SizedBox(height: 12),
-            _buildInfoTile(
-              label: "VEHICLE TYPE",
-              value: vehicle,
-              icon: Icons.directions_car_filled_rounded,
-            ),
-            const SizedBox(height: 12),
-            _buildInfoTile(
-              label: "VEHICLE COLOR",
-              value: color,
-              icon: Icons.palette_outlined,
-            ),
-            if (otherData.isNotEmpty) ...[
-              const SizedBox(height: 20),
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  " ADDITIONAL INFORMATION",
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey,
-                  ),
                 ),
-              ),
-              const SizedBox(height: 10),
-              ...otherData.map(
-                (entry) => Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: _buildInfoTile(
-                    label: entry.key
-                        .replaceFirst(entry.key[0], entry.key[0].toUpperCase())
-                        .replaceAll('_', ' '),
-                    value: entry.value.toString(),
-                    icon: Icons.info_outline,
-                  ),
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInfoTile({
-    required String label,
-    required String value,
-    required IconData icon,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: AppColors.darkNavy.withOpacity(0.05),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(icon, color: AppColors.darkNavy, size: 24),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+                const SizedBox(height: 16),
                 Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey[500],
-                    letterSpacing: 1.1,
-                  ),
-                ),
-                Text(
-                  value,
+                  name.toUpperCase(),
                   style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w900,
                     color: AppColors.darkNavy,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryYellow,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: const Text(
+                    "VERIFIED OPERATOR",
+                    style: TextStyle(
+                      fontSize: 9,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.black,
+                    ),
                   ),
                 ),
               ],
             ),
           ),
+
+          // Detail Section: Minimalist Rows
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: gutter),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 30),
+                  _buildModernRow("Plate Number", plate, Icons.tag),
+                  _buildDivider(),
+                  _buildModernRow(
+                    "Vehicle Type",
+                    vehicle,
+                    Icons.local_taxi_outlined,
+                  ),
+                  _buildDivider(),
+                  _buildModernRow("Color", color, Icons.palette_outlined),
+
+                  // Dynamic fields from JSON
+                  if (otherData.isNotEmpty) ...[
+                    const SizedBox(height: 30),
+                    const Text(
+                      "CREDENTIALS",
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w900,
+                        color: Colors.grey,
+                        letterSpacing: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Expanded(
+                      child: ListView.separated(
+                        physics:
+                            const NeverScrollableScrollPhysics(), // Keeps screen static
+                        itemCount: otherData.length,
+                        separatorBuilder: (context, index) => _buildDivider(),
+                        itemBuilder: (context, index) {
+                          final entry = otherData[index];
+                          return _buildModernRow(
+                            entry.key.toUpperCase().replaceAll('_', ' '),
+                            entry.value.toString(),
+                            Icons.info_outline,
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+
+          // Bottom subtle branding
         ],
       ),
+    );
+  }
+
+  Widget _buildModernRow(String label, String value, IconData icon) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Row(
+        children: [
+          Icon(icon, size: 20, color: AppColors.darkNavy.withOpacity(0.4)),
+          const SizedBox(width: 15),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label.toUpperCase(),
+                style: const TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.grey,
+                  letterSpacing: 0.5,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.darkNavy,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDivider() {
+    return Divider(
+      color: Colors.grey.withOpacity(0.1),
+      thickness: 1,
+      height: 1,
     );
   }
 }

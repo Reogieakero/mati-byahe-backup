@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import '../core/constant/app_colors.dart';
-import '../core/database/local_database.dart'; // Ensure this is imported
+import '../core/database/local_database.dart';
 import '../components/confirmation_dialog.dart';
 import 'edit_profile_controller.dart';
 import 'widgets/profile_form_fields.dart';
 import 'widgets/suffix_dropdown.dart';
-import 'qr_code_screen.dart'; // Ensure this is imported
+import 'qr_code_screen.dart';
 
 class EditProfileScreen extends StatefulWidget {
   final String initialName;
@@ -58,9 +58,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         content: "Are you sure you want to save these changes?",
         confirmText: "Save",
         onConfirm: () async {
-          // Close the dialog first
           Navigator.pop(context);
-
           setState(() => _controller.isLoading = true);
 
           final success = await _controller.saveProfile();
@@ -69,7 +67,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             setState(() => _controller.isLoading = false);
 
             if (success) {
-              // 1. Show Success SnackBar
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Row(
@@ -85,13 +82,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
               );
 
-              // 2. Navigation Logic
               if (widget.role.toLowerCase() == 'driver') {
                 final userId = _controller.getUserId();
                 if (userId != null) {
-                  // Fetch the latest updated data from local DB for the QR Screen
                   final localData = await LocalDatabase().getUserById(userId);
-
                   if (mounted && localData != null) {
                     Navigator.pushReplacement(
                       context,
@@ -103,11 +97,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   }
                 }
               } else {
-                // Passenger: Just go back
                 Navigator.pop(context, true);
               }
             } else {
-              // Error Feedback
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text("Error saving profile. Please try again."),
@@ -165,6 +157,56 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Center(
+                child: GestureDetector(
+                  onTap: () async {
+                    await _controller.pickImage();
+                    setState(() {});
+                  },
+                  child: Stack(
+                    children: [
+                      CircleAvatar(
+                        radius: 55,
+                        backgroundColor: Colors.white,
+                        backgroundImage: _controller.selectedImage != null
+                            ? FileImage(_controller.selectedImage!)
+                            : (_controller.currentAvatarUrl != null
+                                      ? NetworkImage(
+                                          _controller.currentAvatarUrl!,
+                                        )
+                                      : null)
+                                  as ImageProvider?,
+                        child:
+                            _controller.selectedImage == null &&
+                                _controller.currentAvatarUrl == null
+                            ? const Icon(
+                                Icons.person_rounded,
+                                size: 50,
+                                color: Colors.grey,
+                              )
+                            : null,
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        right: 4,
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: const BoxDecoration(
+                            color: AppColors.primaryBlue,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.camera_alt_rounded,
+                            size: 16,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 32),
               const ProfileSectionLabel("NAME DETAILS"),
               ProfileTextField(
                 label: "First Name",
