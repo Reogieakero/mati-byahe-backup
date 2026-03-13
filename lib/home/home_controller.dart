@@ -3,9 +3,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../core/database/local_database.dart';
 import '../core/database/sync_service.dart';
 import '../core/services/trip_service.dart';
-import '../core/constant/app_colors.dart';
 import '../signup/verification_screen.dart';
 import '../components/confirmation_dialog.dart';
+import '../core/widgets/sileo_notification.dart';
 
 class HomeController {
   final LocalDatabase _localDb = LocalDatabase();
@@ -19,22 +19,6 @@ class HomeController {
 
   String _tripPlate(Map<String, dynamic> trip) {
     return (trip['plate_number'] ?? trip['driver_plate'] ?? '').toString();
-  }
-
-  DateTime? _tripDateTime(Map<String, dynamic> trip) {
-    final raw =
-        (trip['start_datetime'] ?? trip['start_time'] ?? trip['created_at'])
-            ?.toString();
-    if (raw == null || raw.isEmpty) return null;
-    return DateTime.tryParse(raw)?.toLocal();
-  }
-
-  bool _isTodayTrip(Map<String, dynamic> trip, DateTime nowLocal) {
-    final dt = _tripDateTime(trip);
-    if (dt == null) return false;
-    return dt.year == nowLocal.year &&
-        dt.month == nowLocal.month &&
-        dt.day == nowLocal.day;
   }
 
   Future<bool> checkVerification(String email) async {
@@ -154,9 +138,11 @@ class HomeController {
       onReturn();
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(
+        SileoNotification.show(
           context,
-        ).showSnackBar(const SnackBar(content: Text("Failed to send code")));
+          'Failed to send code',
+          type: SileoNoticeType.error,
+        );
       }
     } finally {
       setSendingState(false);
@@ -196,83 +182,11 @@ class HomeController {
   }
 
   void showTripStartNotification(BuildContext context) {
-    final overlay = Overlay.of(context);
-    final overlayEntry = OverlayEntry(
-      builder: (context) => Positioned(
-        top: MediaQuery.of(context).padding.top + 10,
-        left: 15,
-        right: 15,
-        child: Material(
-          color: Colors.transparent,
-          child: TweenAnimationBuilder(
-            duration: const Duration(milliseconds: 500),
-            tween: Tween<double>(begin: -100, end: 0),
-            curve: Curves.easeOutBack,
-            builder: (context, double value, child) {
-              return Transform.translate(
-                offset: Offset(0, value),
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: AppColors.darkNavy,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.3),
-                        blurRadius: 10,
-                        offset: const Offset(0, 5),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: const BoxDecoration(
-                          color: AppColors.primaryYellow,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.bolt,
-                          color: AppColors.darkNavy,
-                          size: 20,
-                        ),
-                      ),
-                      const SizedBox(width: 15),
-                      const Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              "Trip Started",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14,
-                              ),
-                            ),
-                            Text(
-                              "Safe travels! Track your fare below.",
-                              style: TextStyle(
-                                color: Colors.white70,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-      ),
+    SileoNotification.show(
+      context,
+      'Trip started. Safe travels and track your fare below.',
+      type: SileoNoticeType.success,
     );
-    overlay.insert(overlayEntry);
-    Future.delayed(const Duration(seconds: 3), () => overlayEntry.remove());
   }
 
   Future<Map<String, dynamic>> getDashboardStats({
@@ -280,8 +194,7 @@ class HomeController {
     required String role,
   }) async {
     final db = await _localDb.database;
-    final nowLocal = DateTime.now();
-    final today = nowLocal.toIso8601String().split('T')[0];
+    final today = DateTime.now().toIso8601String().split('T')[0];
 
     if (role.toLowerCase() == 'driver') {
       try {
@@ -351,17 +264,29 @@ class HomeController {
             }
           }
 
-          if (response != null && (response as List).isNotEmpty) {
+          if (response.isNotEmpty) {
             final matchedTrips = response.where((trip) {
               return _normalizePlate(_tripPlate(trip)) == normalizedPlate;
             }).toList();
 
             final int todayTripCount = matchedTrips.where((trip) {
-              return _isTodayTrip(trip, nowLocal);
+              final String dateSource =
+                  (trip['start_datetime'] ??
+                          trip['start_time'] ??
+                          trip['created_at'] ??
+                          '')
+                      .toString();
+              return dateSource.startsWith(today);
             }).length;
 
             final todayMatchedTrips = matchedTrips.where((trip) {
-              return _isTodayTrip(trip, nowLocal);
+              final String dateSource =
+                  (trip['start_datetime'] ??
+                          trip['start_time'] ??
+                          trip['created_at'] ??
+                          '')
+                      .toString();
+              return dateSource.startsWith(today);
             }).toList();
 
             final int passengerCountToday = todayMatchedTrips
@@ -423,7 +348,8 @@ class HomeController {
 
         final int passengerCountToday = matchedLocalTrips
             .where((trip) {
-              return _isTodayTrip(trip, nowLocal);
+              final String start = (trip['start_time'] ?? '').toString();
+              return start.startsWith(today);
             })
             .map((trip) => trip['passenger_id']?.toString())
             .where((id) => id != null && id.isNotEmpty)
@@ -437,7 +363,8 @@ class HomeController {
             .length;
 
         final int todayTripCount = matchedLocalTrips.where((trip) {
-          return _isTodayTrip(trip, nowLocal);
+          final String start = (trip['start_time'] ?? '').toString();
+          return start.startsWith(today);
         }).length;
 
         return {
@@ -482,7 +409,6 @@ class HomeController {
       };
     }
 
-    // 2. FALLBACK: Fetch from Supabase if Local is empty (e.g., after fresh login)
     try {
       final currentUser = _supabase.auth.currentUser;
       if (currentUser == null) {
@@ -505,7 +431,7 @@ class HomeController {
           .gte('start_datetime', '${today}T00:00:00')
           .lte('start_datetime', '${today}T23:59:59');
 
-      if (response != null && (response as List).isNotEmpty) {
+      if (response.isNotEmpty) {
         return {
           'count': response.length,
           'plate': response.last['plate_number'] ?? "None",

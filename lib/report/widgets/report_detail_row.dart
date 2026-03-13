@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../core/constant/app_colors.dart';
+import '../../../core/widgets/sileo_notification.dart';
 
 class ReportDetailRow extends StatelessWidget {
   final IconData icon;
@@ -19,40 +20,11 @@ class ReportDetailRow extends StatelessWidget {
   });
 
   void _showCustomCopyToast(BuildContext context) {
-    final Color primaryRed = iconColor ?? Colors.redAccent;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            Icon(
-              Icons.check_circle_outline_rounded,
-              color: primaryRed,
-              size: 20,
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                "$label Copied to Clipboard",
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: AppColors.darkNavy, // Matching the Hero card dark
-        behavior: SnackBarBehavior.floating,
-        elevation: 6,
-        margin: const EdgeInsets.fromLTRB(20, 0, 20, 30),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: BorderSide(color: primaryRed.withOpacity(0.5), width: 1),
-        ),
-        duration: const Duration(seconds: 2),
-      ),
+    SileoNotification.show(
+      context,
+      '$label copied to clipboard',
+      type: SileoNoticeType.success,
+      duration: const Duration(seconds: 2),
     );
   }
 

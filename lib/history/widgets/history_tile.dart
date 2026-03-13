@@ -98,20 +98,29 @@ class HistoryTile extends StatelessWidget {
                           if (value == 'view') onViewDetails?.call();
                           if (value == 'delete') onDelete?.call();
                         },
-                        itemBuilder: (context) => [
-                          _buildMenuItem(
-                            value: 'view',
-                            icon: Icons.visibility_outlined,
-                            label: 'VIEW DETAILS',
-                            color: AppColors.darkNavy,
-                          ),
-                          _buildMenuItem(
-                            value: 'delete',
-                            icon: Icons.delete_outline_rounded,
-                            label: 'DELETE',
-                            color: Colors.redAccent,
-                          ),
-                        ],
+                        itemBuilder: (context) {
+                          final items = <PopupMenuItem<String>>[
+                            _buildMenuItem(
+                              value: 'view',
+                              icon: Icons.visibility_outlined,
+                              label: 'VIEW DETAILS',
+                              color: AppColors.darkNavy,
+                            ),
+                          ];
+
+                          if (onDelete != null) {
+                            items.add(
+                              _buildMenuItem(
+                                value: 'delete',
+                                icon: Icons.delete_outline_rounded,
+                                label: 'DELETE',
+                                color: Colors.redAccent,
+                              ),
+                            );
+                          }
+
+                          return items;
+                        },
                       ),
                     ),
                   ],

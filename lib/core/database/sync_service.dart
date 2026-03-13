@@ -8,6 +8,75 @@ class SyncService {
   final LocalDatabase _localDb = LocalDatabase();
   final _supabase = Supabase.instance.client;
 
+  bool _hasValidUuid(dynamic value) {
+    final text = (value ?? '').toString().trim();
+    if (text.isEmpty || text.toLowerCase() == 'null') {
+      return false;
+    }
+    final uuidPattern = RegExp(
+      r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$',
+    );
+    return uuidPattern.hasMatch(text);
+  }
+
+  String _cleanString(dynamic value) {
+    final text = (value ?? '').toString().trim();
+    if (text.isEmpty || text.toLowerCase() == 'null') {
+      return '';
+    }
+    return text;
+  }
+
+  Future<String> _resolveDriverIdForReport(
+    Database db,
+    dynamic tripUuid,
+  ) async {
+    final cleanedTripUuid = _cleanString(tripUuid);
+    if (cleanedTripUuid.isEmpty) return '';
+
+    final tripRows = await db.query(
+      'trips',
+      columns: ['driver_id', 'plate_number'],
+      where: 'uuid = ?',
+      whereArgs: [cleanedTripUuid],
+      limit: 1,
+    );
+
+    if (tripRows.isNotEmpty) {
+      final directDriverId = _cleanString(tripRows.first['driver_id']);
+      if (directDriverId.isNotEmpty) {
+        return directDriverId;
+      }
+
+      final plateNumber = _cleanString(tripRows.first['plate_number']);
+      if (plateNumber.isNotEmpty) {
+        final localDriver = await db.query(
+          'users',
+          columns: ['id'],
+          where: 'plate_number = ?',
+          whereArgs: [plateNumber],
+          limit: 1,
+        );
+        if (localDriver.isNotEmpty) {
+          return _cleanString(localDriver.first['id']);
+        }
+
+        try {
+          final profile = await _supabase
+              .from('profiles')
+              .select('id')
+              .eq('plate_number', plateNumber)
+              .maybeSingle();
+          return _cleanString(profile?['id']);
+        } catch (_) {
+          return '';
+        }
+      }
+    }
+
+    return '';
+  }
+
   Future<void> syncOnStart() async {
     try {
       final result = await InternetAddress.lookup(
@@ -19,6 +88,7 @@ class SyncService {
 
       await pullUserData();
       await _pullTrips(db);
+      await _pullReports(db);
       await _syncProfileChanges(db);
       await _syncTrips(db);
       await _syncReports(db);
@@ -39,29 +109,99 @@ class SyncService {
           .or('passenger_id.eq.${user.id},driver_id.eq.${user.id}')
           .eq('status', 'completed');
 
-      if (remoteTrips != null) {
-        final batch = db.batch();
-        for (var trip in remoteTrips) {
-          batch.insert('trips', {
-            'uuid': trip['uuid'] ?? trip['id'],
-            'passenger_id': trip['passenger_id'],
-            'driver_id': trip['driver_id'],
-            'driver_name': trip['driver_name'],
-            'plate_number': trip['plate_number'],
-            'pickup': trip['pickup'],
-            'drop_off': trip['drop_off'],
-            'fare': (trip['calculated_fare'] as num?)?.toDouble() ?? 0.0,
-            'gas_tier': trip['gas_tier'],
-            'date': trip['created_at'],
-            'start_time': trip['start_time'],
-            'end_time': trip['end_time'],
-            'is_synced': 1,
-          }, conflictAlgorithm: ConflictAlgorithm.replace);
-        }
-        await batch.commit(noResult: true);
+      final batch = db.batch();
+      for (var trip in remoteTrips) {
+        batch.insert('trips', {
+          'uuid': trip['uuid'] ?? trip['id'],
+          'passenger_id': trip['passenger_id'],
+          'driver_id': trip['driver_id'],
+          'driver_name': trip['driver_name'],
+          'plate_number': trip['plate_number'],
+          'pickup': trip['pickup'],
+          'drop_off': trip['drop_off'],
+          'fare': (trip['calculated_fare'] as num?)?.toDouble() ?? 0.0,
+          'gas_tier': trip['gas_tier'],
+          'date': trip['created_at'],
+          'start_time': trip['start_time'],
+          'end_time': trip['end_time'],
+          'is_synced': 1,
+        }, conflictAlgorithm: ConflictAlgorithm.replace);
       }
+      await batch.commit(noResult: true);
     } catch (e) {
       debugPrint("Pull trips error: $e");
+    }
+  }
+
+  Future<void> _pullReports(Database db) async {
+    final user = _supabase.auth.currentUser;
+    if (user == null) return;
+
+    try {
+      final remoteReports = await _supabase
+          .from('reports')
+          .select()
+          .or('passenger_id.eq.${user.id},driver_id.eq.${user.id}')
+          .order('reported_at', ascending: false);
+
+      final tripUuids = remoteReports
+          .map((report) => _cleanString(report['trip_uuid']))
+          .where((uuid) => uuid.isNotEmpty)
+          .toSet()
+          .toList();
+
+      List<dynamic> remoteTrips = [];
+      if (tripUuids.isNotEmpty) {
+        try {
+          remoteTrips = await _supabase
+              .from('trips')
+              .select(
+                'uuid,passenger_id,driver_id,driver_name,plate_number,pickup,drop_off,calculated_fare,gas_tier,created_at,start_datetime,end_datetime',
+              )
+              .inFilter('uuid', tripUuids);
+        } catch (e) {
+          debugPrint('Pull report-related trips error: $e');
+        }
+      }
+
+      final batch = db.batch();
+      for (var report in remoteReports) {
+        batch.insert('reports', {
+          'trip_uuid': report['trip_uuid'],
+          'passenger_id': report['passenger_id'],
+          'driver_id': report['driver_id'],
+          'issue_type': report['issue_type'],
+          'description': report['description'],
+          'evidence_url': report['evidence_url'],
+          'status': report['status'] ?? 'pending',
+          'reported_at': report['reported_at'],
+          'is_synced': 1,
+          'is_deleted': 0,
+          'is_unreported': 0,
+        }, conflictAlgorithm: ConflictAlgorithm.replace);
+      }
+
+      for (var trip in remoteTrips) {
+        batch.insert('trips', {
+          'uuid': trip['uuid'],
+          'passenger_id': trip['passenger_id'],
+          'driver_id': trip['driver_id'],
+          'driver_name': trip['driver_name'],
+          'plate_number': trip['plate_number'],
+          'pickup': trip['pickup'] ?? 'Unknown',
+          'drop_off': trip['drop_off'] ?? '',
+          'fare': (trip['calculated_fare'] as num?)?.toDouble() ?? 0.0,
+          'gas_tier': trip['gas_tier'],
+          'date': trip['created_at'],
+          'start_time': trip['start_datetime'],
+          'end_time': trip['end_datetime'],
+          'is_synced': 1,
+        }, conflictAlgorithm: ConflictAlgorithm.replace);
+      }
+
+      await batch.commit(noResult: true);
+    } catch (e) {
+      debugPrint('Pull reports error: $e');
     }
   }
 
@@ -182,11 +322,43 @@ class SyncService {
       whereArgs: [0, 0],
     );
     for (var data in unsynced) {
+      final tripUuid = data['trip_uuid'];
+      final passengerId = data['passenger_id'];
+      var driverId = data['driver_id'];
+
+      if (!_hasValidUuid(driverId)) {
+        final resolvedDriverId = await _resolveDriverIdForReport(db, tripUuid);
+        if (_hasValidUuid(resolvedDriverId)) {
+          driverId = resolvedDriverId;
+          await db.update(
+            'reports',
+            {'driver_id': resolvedDriverId},
+            where: 'id = ?',
+            whereArgs: [data['id']],
+          );
+        }
+      }
+
+      if (!_hasValidUuid(tripUuid) ||
+          !_hasValidUuid(passengerId) ||
+          !_hasValidUuid(driverId)) {
+        debugPrint(
+          'Skipping invalid local report row id=${data['id']} trip_uuid=$tripUuid passenger_id=$passengerId driver_id=$driverId',
+        );
+        await db.update(
+          'reports',
+          {'is_synced': -1},
+          where: 'id = ?',
+          whereArgs: [data['id']],
+        );
+        continue;
+      }
+
       try {
         await _supabase.from('reports').upsert({
-          'trip_uuid': data['trip_uuid'],
-          'passenger_id': data['passenger_id'],
-          'driver_id': data['driver_id'],
+          'trip_uuid': tripUuid,
+          'passenger_id': passengerId,
+          'driver_id': driverId,
           'issue_type': data['issue_type'],
           'description': data['description'],
           'evidence_url': data['evidence_url'],

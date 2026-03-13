@@ -7,6 +7,7 @@ import '../../core/services/fare_service.dart';
 import '../../core/services/location_data_service.dart';
 import '../../core/constant/app_colors.dart';
 import '../home_controller.dart';
+import '../../core/widgets/sileo_notification.dart';
 
 class LocationSelector extends StatefulWidget {
   final String email;
@@ -161,10 +162,10 @@ class _LocationSelectorState extends State<LocationSelector> {
                     ElevatedButton(
                       onPressed: () {
                         if (_plateController.text.trim().isEmpty) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("Plate number is required"),
-                            ),
+                          SileoNotification.show(
+                            context,
+                            'Plate number is required',
+                            type: SileoNoticeType.warning,
                           );
                           return;
                         }

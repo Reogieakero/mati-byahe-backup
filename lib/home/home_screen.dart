@@ -175,7 +175,7 @@ class _HomeScreenState extends State<HomeScreen>
                     email: widget.email,
                     role: widget.role,
                   ),
-                  const ActionGridWidget(),
+                  ActionGridWidget(role: widget.role),
                   const SizedBox(height: 10),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15),

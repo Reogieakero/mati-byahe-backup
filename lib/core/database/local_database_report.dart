@@ -8,6 +8,9 @@ extension ReportDatabase on LocalDatabase {
     required String issueType,
     required String description,
     String? evidencePath,
+    String status = 'pending',
+    String? reportedAt,
+    int isSynced = 0,
   }) async {
     final db = await database;
     await db.insert('reports', {
@@ -17,9 +20,9 @@ extension ReportDatabase on LocalDatabase {
       'issue_type': issueType,
       'description': description,
       'evidence_url': evidencePath,
-      'status': 'pending',
-      'reported_at': DateTime.now().toIso8601String(),
-      'is_synced': 0,
+      'status': status,
+      'reported_at': reportedAt ?? DateTime.now().toIso8601String(),
+      'is_synced': isSynced,
       'is_deleted': 0,
       'is_unreported': 0,
     }, conflictAlgorithm: ConflictAlgorithm.replace);
@@ -40,7 +43,7 @@ extension ReportDatabase on LocalDatabase {
         t.start_time,
         t.end_time
       FROM reports r
-      INNER JOIN trips t ON r.trip_uuid = t.uuid
+      LEFT JOIN trips t ON r.trip_uuid = t.uuid
       WHERE r.passenger_id = ? 
         AND r.is_deleted = 0 
         AND r.is_unreported = 0
@@ -48,6 +51,48 @@ extension ReportDatabase on LocalDatabase {
     ''',
       [passengerId],
     );
+  }
+
+  Future<List<Map<String, dynamic>>> getReportsForDriver(
+    String driverId,
+  ) async {
+    final db = await database;
+    return await db.rawQuery(
+      '''
+      SELECT 
+        r.*, 
+        t.pickup, 
+        t.drop_off, 
+        t.driver_name,
+        t.plate_number,
+        t.start_time,
+        t.end_time
+      FROM reports r
+      LEFT JOIN trips t ON r.trip_uuid = t.uuid
+      WHERE r.driver_id = ? 
+        AND r.is_deleted = 0 
+      ORDER BY r.id DESC
+    ''',
+      [driverId],
+    );
+  }
+
+  Future<List<Map<String, dynamic>>> getAllDriverVisibleReports() async {
+    final db = await database;
+    return await db.rawQuery('''
+      SELECT 
+        r.*, 
+        t.pickup, 
+        t.drop_off, 
+        t.driver_name,
+        t.plate_number,
+        t.start_time,
+        t.end_time
+      FROM reports r
+      LEFT JOIN trips t ON r.trip_uuid = t.uuid
+      WHERE r.is_deleted = 0
+      ORDER BY r.id DESC
+    ''');
   }
 
   Future<int> deleteReportPermanently(int id) async {

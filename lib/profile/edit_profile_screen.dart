@@ -6,6 +6,7 @@ import 'edit_profile_controller.dart';
 import 'widgets/profile_form_fields.dart';
 import 'widgets/suffix_dropdown.dart';
 import 'qr_code_screen.dart';
+import '../core/widgets/sileo_notification.dart';
 
 class EditProfileScreen extends StatefulWidget {
   final String initialName;
@@ -67,19 +68,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             setState(() => _controller.isLoading = false);
 
             if (success) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Row(
-                    children: [
-                      Icon(Icons.check_circle_rounded, color: Colors.white),
-                      SizedBox(width: 12),
-                      Text("Profile saved successfully!"),
-                    ],
-                  ),
-                  backgroundColor: Colors.green,
-                  behavior: SnackBarBehavior.floating,
-                  duration: Duration(seconds: 2),
-                ),
+              SileoNotification.show(
+                context,
+                'Profile saved successfully!',
+                type: SileoNoticeType.success,
+                duration: const Duration(seconds: 2),
               );
 
               if (widget.role.toLowerCase() == 'driver') {
@@ -100,12 +93,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 Navigator.pop(context, true);
               }
             } else {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text("Error saving profile. Please try again."),
-                  backgroundColor: Colors.redAccent,
-                  behavior: SnackBarBehavior.floating,
-                ),
+              SileoNotification.show(
+                context,
+                'Error saving profile. Please try again.',
+                type: SileoNoticeType.error,
               );
             }
           }

@@ -4,6 +4,7 @@ import '../core/constant/app_colors.dart';
 import '../core/database/local_database.dart';
 import '../core/database/sync_service.dart';
 import '../components/confirmation_dialog.dart';
+import '../core/widgets/sileo_notification.dart';
 
 class SetPinScreen extends StatefulWidget {
   const SetPinScreen({super.key});
@@ -144,13 +145,10 @@ class _SetPinScreenState extends State<SetPinScreen> {
   }
 
   void _showNotification(String message, {bool isError = false}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: isError ? Colors.redAccent : AppColors.primaryBlue,
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.all(15),
-      ),
+    SileoNotification.show(
+      context,
+      message,
+      type: isError ? SileoNoticeType.error : SileoNoticeType.success,
     );
   }
 

@@ -14,17 +14,19 @@ class LoginInput extends StatelessWidget {
     required this.label,
     this.obscureText = false,
     this.suffix,
-    this.radius = 50,
+    this.radius = 14,
   });
 
   @override
   Widget build(BuildContext context) {
+    final Color fieldColor = Theme.of(context).colorScheme.surface;
+
     return TextField(
       controller: controller,
       obscureText: obscureText,
       decoration: InputDecoration(
         filled: true,
-        fillColor: Colors.white.withOpacity(0.9),
+        fillColor: fieldColor,
         labelText: label,
         labelStyle: const TextStyle(color: AppColors.textGrey, fontSize: 14),
         floatingLabelStyle: const TextStyle(
@@ -42,7 +44,9 @@ class LoginInput extends StatelessWidget {
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radius),
-          borderSide: const BorderSide(color: AppColors.softWhite),
+          borderSide: BorderSide(
+            color: AppColors.primaryBlue.withOpacity(0.12),
+          ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radius),

@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
@@ -8,6 +7,8 @@ import 'data/signup_repository.dart';
 import 'widgets/signup_background.dart';
 import '../login/widgets/login_widgets.dart';
 import '../navigation/main_navigation.dart';
+import '../core/widgets/sileo_notification.dart';
+import '../core/widgets/sileo_dialog.dart';
 
 class VerificationScreen extends StatefulWidget {
   final String email;
@@ -30,15 +31,10 @@ class _VerificationScreenState extends State<VerificationScreen> {
   }
 
   void _showNotification(String message, {bool isError = true}) {
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: isError ? Colors.redAccent : Colors.green,
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.all(20),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
+    SileoNotification.show(
+      context,
+      message,
+      type: isError ? SileoNoticeType.error : SileoNoticeType.success,
     );
   }
 
@@ -71,60 +67,33 @@ class _VerificationScreenState extends State<VerificationScreen> {
   }
 
   void _showSuccessDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.check_circle, color: Colors.green, size: 80),
-            const SizedBox(height: 20),
-            const Text(
-              "Account Verified!",
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: AppColors.darkNavy,
-              ),
-            ),
-            const SizedBox(height: 10),
-            const Text(
-              "Your account is now ready to use.",
-              textAlign: TextAlign.center,
-              style: TextStyle(color: AppColors.textGrey),
-            ),
-            const SizedBox(height: 30),
-            PrimaryButton(
-              label: "Go to Home",
-              onPressed: () async {
-                final db = await _localDb.database;
-                final List<Map<String, dynamic>> user = await db.query(
-                  'users',
-                  where: 'email = ?',
-                  whereArgs: [widget.email],
-                );
+    SileoDialog.show(
+      context,
+      type: SileoDialogType.success,
+      title: 'Account Verified!',
+      message: 'Your account is now ready to use.',
+      actionLabel: 'Go to Home',
+      onAction: () async {
+        final db = await _localDb.database;
+        final List<Map<String, dynamic>> user = await db.query(
+          'users',
+          where: 'email = ?',
+          whereArgs: [widget.email],
+        );
 
-                String role = user.isNotEmpty
-                    ? user.first['role']
-                    : "Passenger";
+        String role = user.isNotEmpty ? user.first['role'] : 'Passenger';
 
-                if (context.mounted) {
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          MainNavigation(email: widget.email, role: role),
-                    ),
-                    (route) => false,
-                  );
-                }
-              },
+        if (context.mounted) {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  MainNavigation(email: widget.email, role: role),
             ),
-          ],
-        ),
-      ),
+            (route) => false,
+          );
+        }
+      },
     );
   }
 

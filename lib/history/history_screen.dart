@@ -7,7 +7,6 @@ import 'widgets/history_header.dart';
 import 'widgets/history_tile.dart';
 import 'widgets/history_empty_state.dart';
 import 'history_details_screen.dart';
-import '../../components/confirmation_dialog.dart';
 
 class HistoryScreen extends StatefulWidget {
   final String email;
@@ -24,7 +23,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   List<Map<String, dynamic>> _allTrips = [];
   List<Map<String, dynamic>> _filteredTrips = [];
-  bool _isSearching = false;
 
   @override
   void initState() {
@@ -115,7 +113,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                     ),
                                   );
                                 },
-                                onDelete: () => _handleDelete(trip),
                               );
                             },
                           ),
@@ -184,21 +181,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  void _handleDelete(Map<String, dynamic> trip) {
-    showDialog(
-      context: context,
-      builder: (context) => ConfirmationDialog(
-        title: "Delete Trip",
-        content: "Are you sure you want to delete this trip record?",
-        confirmText: "Delete",
-        onConfirm: () async {
-          await _tripService.deleteTrip(trip['uuid']);
-          _loadTrips();
-        },
       ),
     );
   }

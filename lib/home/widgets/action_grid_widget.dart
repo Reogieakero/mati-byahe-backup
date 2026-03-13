@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
 import '../../core/constant/app_colors.dart';
 import '../../other screens/news_screen.dart';
-import '../../other screens/report_screen.dart';
 import '../../other screens/tracking_screen.dart';
 import '../../qrscanner/qr_scanner_view.dart';
+import '../../report/driver_report_history_screen.dart';
 
 class ActionGridWidget extends StatelessWidget {
-  const ActionGridWidget({super.key});
+  final String role;
+
+  const ActionGridWidget({super.key, required this.role});
 
   @override
   Widget build(BuildContext context) {
+    final isDriver = role.toLowerCase() == 'driver';
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
       child: Row(
@@ -21,12 +25,20 @@ class ActionGridWidget extends StatelessWidget {
               MaterialPageRoute(builder: (_) => const NewsScreen()),
             );
           }),
-          _buildItem(Icons.analytics_rounded, "Track", () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const TrackingScreen()),
-            );
-          }),
+          _buildItem(
+            isDriver ? Icons.report_problem_rounded : Icons.analytics_rounded,
+            isDriver ? "Report" : "Track",
+            () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => isDriver
+                      ? const DriverReportHistoryScreen()
+                      : const TrackingScreen(),
+                ),
+              );
+            },
+          ),
           _buildItem(Icons.qr_code_scanner_rounded, "Scan QR", () {
             _openQrScanner(context);
           }),

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../core/constant/app_colors.dart';
 import '../components/confirmation_dialog.dart';
 import 'widgets/reported/reason_selector.dart';
@@ -10,6 +11,7 @@ import 'widgets/reported/submit_button.dart';
 import 'widgets/reported/media_proof.dart';
 import '../core/database/local_database.dart';
 import '../core/database/sync_service.dart';
+import '../core/widgets/sileo_notification.dart';
 
 class ReportScreen extends StatefulWidget {
   final Map<String, dynamic> trip;
@@ -25,6 +27,7 @@ class _ReportScreenState extends State<ReportScreen> {
   final TextEditingController _otherReasonController = TextEditingController();
   final ImagePicker _picker = ImagePicker();
   final LocalDatabase _localDb = LocalDatabase();
+  final _supabase = Supabase.instance.client;
   String? _selectedReason;
   File? _proofFile;
   bool _isSubmitting = false;
@@ -38,6 +41,49 @@ class _ReportScreenState extends State<ReportScreen> {
     "Uncomfortable Ride",
     "Other",
   ];
+
+  String _asCleanString(dynamic value) {
+    final text = (value ?? '').toString().trim();
+    if (text.isEmpty || text.toLowerCase() == 'null') {
+      return '';
+    }
+    return text;
+  }
+
+  Future<String> _resolveDriverIdFromTrip() async {
+    final directDriverId = _asCleanString(widget.trip['driver_id']);
+    if (directDriverId.isNotEmpty) {
+      return directDriverId;
+    }
+
+    final plateNumber = _asCleanString(widget.trip['plate_number']);
+    if (plateNumber.isEmpty) {
+      return '';
+    }
+
+    final db = await _localDb.database;
+    final localDriver = await db.query(
+      'users',
+      columns: ['id'],
+      where: 'plate_number = ?',
+      whereArgs: [plateNumber],
+      limit: 1,
+    );
+    if (localDriver.isNotEmpty) {
+      return _asCleanString(localDriver.first['id']);
+    }
+
+    try {
+      final profile = await _supabase
+          .from('profiles')
+          .select('id')
+          .eq('plate_number', plateNumber)
+          .maybeSingle();
+      return _asCleanString(profile?['id']);
+    } catch (_) {
+      return '';
+    }
+  }
 
   Future<void> _handleMediaPick(bool isVideo) async {
     final XFile? pickedFile = isVideo
@@ -61,26 +107,74 @@ class _ReportScreenState extends State<ReportScreen> {
       final String issueType = _selectedReason == "Other"
           ? _otherReasonController.text
           : _selectedReason!;
+      final currentUser = _supabase.auth.currentUser;
+      final tripUuid = _asCleanString(
+        widget.trip['uuid'] ?? widget.trip['trip_uuid'] ?? widget.trip['id'],
+      );
+      final passengerId = _asCleanString(
+        widget.trip['passenger_id'] ?? currentUser?.id,
+      );
+      final driverId = await _resolveDriverIdFromTrip();
+
+      if (tripUuid.isEmpty || passengerId.isEmpty || driverId.isEmpty) {
+        throw Exception(
+          'Missing trip reference. Unable to submit this report because trip_uuid, passenger_id, or driver_id is empty.',
+        );
+      }
+
+      final String reportedAt = DateTime.now().toIso8601String();
+      final payload = {
+        'trip_uuid': tripUuid,
+        'passenger_id': passengerId,
+        'driver_id': driverId,
+        'issue_type': issueType,
+        'description': _detailsController.text,
+        'evidence_url': _proofFile?.path,
+        'status': 'pending',
+        'reported_at': reportedAt,
+      };
+
+      var synced = false;
+      try {
+        await _supabase
+            .from('reports')
+            .upsert(payload, onConflict: 'trip_uuid');
+        synced = true;
+      } catch (e) {
+        debugPrint('Direct report insert failed: $e');
+      }
 
       await _localDb.saveReport(
-        tripUuid: widget.trip['uuid'],
-        passengerId: widget.trip['passenger_id'].toString(),
-        driverId: widget.trip['driver_id'].toString(),
+        tripUuid: tripUuid,
+        passengerId: passengerId,
+        driverId: driverId,
         issueType: issueType,
         description: _detailsController.text,
         evidencePath: _proofFile?.path,
+        status: 'pending',
+        reportedAt: reportedAt,
+        isSynced: synced ? 1 : 0,
       );
 
-      await SyncService().syncOnStart();
+      if (!synced) {
+        await SyncService().syncOnStart();
+      }
 
       if (!mounted) return;
+
+      if (!synced) {
+        SileoNotification.show(
+          context,
+          'Report saved locally and will sync when available.',
+          type: SileoNoticeType.info,
+        );
+      }
+
       Navigator.pop(context, true);
     } catch (e) {
       setState(() => _isSubmitting = false);
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: $e"), backgroundColor: Colors.black),
-      );
+      SileoNotification.show(context, 'Error: $e', type: SileoNoticeType.error);
     }
   }
 

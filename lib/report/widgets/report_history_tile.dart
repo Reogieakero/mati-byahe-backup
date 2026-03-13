@@ -106,20 +106,29 @@ class ReportHistoryTile extends StatelessWidget {
                       if (value == 'view') onViewDetails?.call();
                       if (value == 'unreport') onDelete?.call();
                     },
-                    itemBuilder: (context) => [
-                      _buildMenuItem(
-                        value: 'view',
-                        icon: Icons.visibility_outlined,
-                        label: 'VIEW DETAILS',
-                        color: AppColors.darkNavy,
-                      ),
-                      _buildMenuItem(
-                        value: 'unreport',
-                        icon: Icons.undo_rounded,
-                        label: 'UNREPORT',
-                        color: Colors.redAccent,
-                      ),
-                    ],
+                    itemBuilder: (context) {
+                      final items = <PopupMenuItem<String>>[
+                        _buildMenuItem(
+                          value: 'view',
+                          icon: Icons.visibility_outlined,
+                          label: 'VIEW DETAILS',
+                          color: AppColors.darkNavy,
+                        ),
+                      ];
+
+                      if (onDelete != null) {
+                        items.add(
+                          _buildMenuItem(
+                            value: 'unreport',
+                            icon: Icons.undo_rounded,
+                            label: 'UNREPORT',
+                            color: Colors.redAccent,
+                          ),
+                        );
+                      }
+
+                      return items;
+                    },
                   ),
                 ),
               ],

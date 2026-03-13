@@ -56,12 +56,6 @@
 
 //   void _showError() {
 //     HapticFeedback.vibrate();
-//     ScaffoldMessenger.of(context).showSnackBar(
-//       const SnackBar(
-//         content: Text("Incorrect PIN"),
-//         backgroundColor: Colors.redAccent,
-//       ),
-//     );
 //     setState(() => _inputPin = "");
 //   }
 

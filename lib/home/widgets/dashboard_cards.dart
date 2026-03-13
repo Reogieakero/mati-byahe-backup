@@ -22,132 +22,94 @@ class DashboardCards extends StatelessWidget {
     final bool isDriver = role.toLowerCase() == 'driver';
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
-          // Navy Blue is dominant, White acts as a "line/sheen" gradient
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            stops: const [0.0, 0.3, 1.0],
-            colors: [
-              AppColors.darkNavy,
-              AppColors.darkNavy.withBlue(
-                100,
-              ), // Slight lighter navy transition
-              AppColors.darkNavy,
-            ],
-          ),
+          color: AppColors.darkNavy,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.white.withOpacity(0.1)),
+          border: Border.all(color: Colors.white.withOpacity(0.05)),
           boxShadow: [
             BoxShadow(
-              color: AppColors.darkNavy.withOpacity(0.3),
-              blurRadius: 20,
-              offset: const Offset(0, 10),
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 8,
+              offset: const Offset(0, 3),
             ),
           ],
         ),
-        child: Stack(
+        child: Column(
           children: [
-            // This adds the "White Line Gradient" effect across the top
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: Container(
-                height: 1,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Colors.transparent,
-                      Colors.white.withOpacity(0.2),
-                      Colors.transparent,
-                    ],
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
+              child: Row(
+                children: [
+                  Container(
+                    width: 42,
+                    height: 42,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.08),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.person_rounded,
+                      color: Colors.white,
+                      size: 22,
+                    ),
                   ),
-                ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          email.split('@')[0].toUpperCase(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.2,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          role.toUpperCase(),
+                          style: TextStyle(
+                            color: AppColors.primaryYellow.withOpacity(0.9),
+                            fontSize: 9,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.8,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 9,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isDriver
+                          ? Colors.greenAccent.withOpacity(0.14)
+                          : Colors.white.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Text(
+                      isDriver ? 'ONLINE' : 'ONGOING',
+                      style: TextStyle(
+                        color: isDriver ? Colors.greenAccent : Colors.white,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 9,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-            Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 50,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.1),
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.white.withOpacity(0.1),
-                          ),
-                        ),
-                        child: const Icon(
-                          Icons.person_rounded,
-                          color: Colors.white,
-                          size: 28,
-                        ),
-                      ),
-                      const SizedBox(width: 15),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              email.split('@')[0].toUpperCase(),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                            Text(
-                              role.toUpperCase(),
-                              style: TextStyle(
-                                color: AppColors.primaryYellow.withOpacity(0.9),
-                                fontSize: 11,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: 1.0,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: isDriver
-                              ? Colors.greenAccent.withOpacity(0.2)
-                              : Colors.white.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          isDriver ? 'ONLINE' : 'ONGOING',
-                          style: TextStyle(
-                            color: isDriver ? Colors.greenAccent : Colors.white,
-                            fontWeight: FontWeight.w900,
-                            fontSize: 9,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Divider(color: Colors.white.withOpacity(0.05), height: 1),
-                Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: isDriver
-                      ? _buildDriverStats()
-                      : _buildPassengerStats(),
-                ),
-              ],
+            Divider(color: Colors.white.withOpacity(0.06), height: 1),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
+              child: isDriver ? _buildDriverStats() : _buildPassengerStats(),
             ),
           ],
         ),
@@ -157,21 +119,22 @@ class DashboardCards extends StatelessWidget {
 
   Widget _buildDriverStats() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _buildStatColumn(
-          'PASSENGERS TODAY',
-          '$passengerCount',
-          Icons.people_alt_rounded,
+        Expanded(
+          child: _buildStatColumn(
+            'PASSENGERS TODAY',
+            '$passengerCount',
+            Icons.people_alt_rounded,
+          ),
         ),
         _buildStatDivider(),
-        _buildStatColumn(
-          'TODAY TRIP',
-          '$tripCount',
-          Icons.directions_car_rounded,
+        Expanded(
+          child: _buildStatColumn(
+            'TODAY TRIP',
+            '$tripCount',
+            Icons.directions_car_rounded,
+          ),
         ),
-        _buildStatDivider(),
-        _buildStatColumn('RATING', '4.9', Icons.star_rounded, isYellow: true),
       ],
     );
   }
@@ -250,22 +213,25 @@ class DashboardCards extends StatelessWidget {
     bool isYellow = false,
   }) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Text(
           label,
           style: const TextStyle(
             color: Colors.white60,
             fontWeight: FontWeight.bold,
-            fontSize: 9,
+            fontSize: 10,
             letterSpacing: 1.0,
           ),
+          textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 7),
         Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               icon,
-              size: 16,
+              size: 15,
               color: isYellow ? AppColors.primaryYellow : Colors.white70,
             ),
             const SizedBox(width: 4),
@@ -273,7 +239,7 @@ class DashboardCards extends StatelessWidget {
               value,
               style: const TextStyle(
                 color: Colors.white,
-                fontSize: 24,
+                fontSize: 22,
                 fontWeight: FontWeight.w800,
               ),
             ),
@@ -285,9 +251,9 @@ class DashboardCards extends StatelessWidget {
 
   Widget _buildStatDivider() {
     return Container(
-      height: 30,
+      height: 22,
       width: 1,
-      color: Colors.white.withOpacity(0.1),
+      color: Colors.white.withOpacity(0.08),
     );
   }
 }

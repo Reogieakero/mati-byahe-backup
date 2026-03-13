@@ -4,7 +4,8 @@ import '../history/history_screen.dart';
 import '../qrscanner/qr_scanner_view.dart';
 import '../profile/profile_screen.dart';
 import '../report/report_history_screen.dart';
-import '../core/constant/app_texts.dart';
+import '../other screens/driver_earnings_screen.dart';
+import '../other screens/driver_vehicle_screen.dart';
 
 class NavigationScreens {
   static List<Widget> getScreens(String email, String role) {
@@ -13,8 +14,8 @@ class NavigationScreens {
     if (normalizedRole == 'driver') {
       return [
         HomeScreen(email: email, role: role),
-        _placeholder(AppTexts.navEarnings),
-        _placeholder(AppTexts.navVehicle),
+        const DriverEarningsScreen(),
+        const DriverVehicleScreen(),
         ProfileScreen(email: email, role: role),
       ];
     }
@@ -26,22 +27,5 @@ class NavigationScreens {
       const ReportHistoryScreen(),
       ProfileScreen(email: email, role: role),
     ];
-  }
-
-  static Widget _placeholder(String text) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Center(
-        child: Text(
-          text.toUpperCase(),
-          style: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w900,
-            color: Colors.grey,
-            letterSpacing: 1.2,
-          ),
-        ),
-      ),
-    );
   }
 }
